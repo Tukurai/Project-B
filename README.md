@@ -1,2 +1,2 @@
-# mini-project
-Mini project for HR semester 2.
+# project-b
+Project B for HR semester 2.
