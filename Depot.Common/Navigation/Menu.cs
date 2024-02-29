@@ -48,7 +48,14 @@ namespace Depot.Common.Navigation
                 var selectedOption = ActiveItem.Options.Find(x => x.KeyChar == input);
                 if (selectedOption != null)
                 {
-                    selectedOption.Action();
+                    if (selectedOption.Action == null)
+                    {
+                        ActiveItem = selectedOption;
+                    }
+                    else
+                    {
+                        selectedOption.Action();
+                    }
                 }
             } while (IsShowing);
         }

@@ -21,6 +21,14 @@ class Program
         var reserveren = new SubMenu('1', "Reservering maken", "Maak een reservering voor een rondleiding.", StartReservation);
         consoleMenu.AddMenuItem(reserveren);
 
+        var testSubmenu = new SubMenu('2', "Extra menu", "Hier vind je nog meer opties.");
+        testSubmenu.AddMenuItem(new SubMenu('1', "Test", "Dit is een test.", () => { Console.WriteLine("AAB 1"); Console.ReadLine(); }));
+        testSubmenu.AddMenuItem(new SubMenu('2', "Test", "Dit is een test.", () => { Console.WriteLine("AAB 2"); Console.ReadLine(); }));
+        testSubmenu.AddMenuItem(new SubMenu('3', "Test", "Dit is een test.", () => { Console.WriteLine("AAB 3"); Console.ReadLine(); }));
+        testSubmenu.AddMenuItem(new SubMenu('4', "Test", "Dit is een test.", () => { Console.WriteLine("AAB 4"); Console.ReadLine(); }));
+        testSubmenu.AddMenuItem(new SubMenu('5', "Terug", "Terug naar het hoofdmenu.", () => { Console.WriteLine("AAB 4"); Console.ReadLine(); consoleMenu?.Reset(); }));
+        consoleMenu.AddMenuItem(testSubmenu);
+
         consoleMenu.Show();
     }
 
