@@ -1,4 +1,5 @@
 ﻿
+
 namespace Depot.Common.Navigation
 {
     public class Menu
@@ -50,6 +51,11 @@ namespace Depot.Common.Navigation
                     selectedOption.Action();
                 }
             } while (IsShowing);
+        }
+
+        public void Reset()
+        {
+            ActiveItem = this;
         }
     }
 }
