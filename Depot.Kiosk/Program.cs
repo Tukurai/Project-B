@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 
 namespace Depot.Kiosk;
 
@@ -21,7 +22,10 @@ class Program
         var reserveren = new SubMenu('1', "Reservering maken", "Maak een reservering voor een rondleiding.", StartReservation);
         consoleMenu.AddMenuItem(reserveren);
 
-        var testSubmenu = new SubMenu('2', "Extra menu", "Hier vind je nog meer opties.");
+        var annuleren = new SubMenu('2', "Reservering annuleren", "Annuleer een reservering voor een rondleiding.", CancelReservation);
+        consoleMenu.AddMenuItem(annuleren);
+
+        var testSubmenu = new SubMenu('3', "Extra menu", "Hier vind je nog meer opties.");
         testSubmenu.AddMenuItem(new SubMenu('1', "Test", "Dit is een test.", () => { Console.WriteLine("AAB 1"); Console.ReadLine(); }));
         testSubmenu.AddMenuItem(new SubMenu('2', "Test", "Dit is een test.", () => { Console.WriteLine("AAB 2"); Console.ReadLine(); }));
         testSubmenu.AddMenuItem(new SubMenu('3', "Test", "Dit is een test.", () => { Console.WriteLine("AAB 3"); Console.ReadLine(); }));
@@ -44,7 +48,7 @@ class Program
     {
         var amountOfTickets = GetAmountOfTickets();
         var tourId = GetTour();
-        
+
         List<int> ticketNumbers = new List<int>();
         for (int i = 0; i < amountOfTickets; i++)
         {
@@ -54,12 +58,51 @@ class Program
         ReserveTour(tourId, ticketNumbers);
     }
 
+    private static void CancelReservation()
+    {
+        var ticketNumber = GetTicketNumber();
+
+        CancelTour(ticketNumber);
+    }
+
     private static void ReserveTour(int tourId, List<int> ticketNumbers)
     {
         Console.WriteLine($"Uw reservering is geplaatst voor tour {tourId}, met {ticketNumbers.Count()} mensen.");
         Console.WriteLine("Druk op enter om terug naar het hoofdmenu te gaan.");
         consoleMenu?.Reset();
         Console.ReadLine();
+    }
+
+    private static void CancelTour(int ticketNumber)
+    {
+        // TODO: Get tour reservation data here...
+        // -- bool set to true for testing
+        bool foundReservation = true;
+
+        if (foundReservation)
+        {
+            Console.WriteLine("Reservering voor (tourId) van (tijd) gevonden.");
+            Console.WriteLine("Weet u zeker dat u uw reservering wil annuleren? (y/n)");
+
+            var userInput = Console.ReadLine() ?? "";
+            if (userInput == "y")
+            {
+                // TODO: Cancel tour here, remove from json data...
+                Console.WriteLine($"Uw reservering voor (tourId) van (tijd) is geannuleerd.");
+            }
+            else
+            {
+                Console.WriteLine("Reservering niet geannuleerd.");
+            }
+
+            Console.WriteLine("Druk op enter om terug naar het hoofdmenu te gaan.");
+            consoleMenu?.Reset();
+            Console.ReadLine();
+        }
+        else
+        {
+            Console.WriteLine("Geen reservering gevonden voor het opgegeven ticketnummer.");
+        }
     }
 
     private static int GetTour()
