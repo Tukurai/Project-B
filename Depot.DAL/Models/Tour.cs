@@ -8,13 +8,11 @@ using System.Threading.Tasks;
 
 namespace Depot.DAL.Models
 {
-    public class Tour
+    public class Tour: BaseModel
     {
-        [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int Id { get; set; }
         public DateTime Start { get; set; }
         public List<int> Registrations { get; set; } = new List<int>();
         public List<int> Queue { get; set; } = new List<int>();
     }
+    
 }

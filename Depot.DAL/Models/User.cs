@@ -9,11 +9,8 @@ using Depot.DAL.Enums;
 
 namespace Depot.DAL.Models
 {
-    public class User
+    public class User: BaseModel
     {
-        [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int Id { get; set; }
         public Role Role { get; set; }
         public string Name{ get; set; } = "";
     }
