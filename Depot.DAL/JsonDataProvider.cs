@@ -3,9 +3,8 @@ using Newtonsoft.Json;
 
 namespace Depot.DAL;
 
-public class JsonDataProvider<T> : IDataProvider<T> where T : DbEntity
+public sealed class JsonDataProvider<T> : BaseDataProvider<T> where T : DbEntity
 {
-    public List<T> Data { get; private set; } = [];
     public string FilePath { get;}
 
     public JsonDataProvider(string fileName)
@@ -14,7 +13,7 @@ public class JsonDataProvider<T> : IDataProvider<T> where T : DbEntity
         LoadAllFromProvider();
     }
 
-    public void LoadAllFromProvider()
+    protected override void LoadAllFromProvider()
     {
         if (File.Exists(FilePath))
         {
@@ -30,17 +29,17 @@ public class JsonDataProvider<T> : IDataProvider<T> where T : DbEntity
         }
     }
 
-    public void SaveToProvider(T entity)
+    protected override void SaveToProvider(T entity)
     {
         SaveChanges();
     }
 
-    public void UpdateToProvider(T entity)
+    protected override void UpdateToProvider(T entity)
     {
         SaveChanges();
     }
 
-    public void DeleteToProvider(T entity)
+    protected override void DeleteToProvider(T entity)
     {
         SaveChanges();
     }
