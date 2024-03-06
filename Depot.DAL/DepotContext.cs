@@ -14,31 +14,35 @@ namespace Depot.DAL
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlite("Data Source=depot.db");
+            optionsBuilder.UseInMemoryDatabase(databaseName: "Depot");
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<User>().HasKey(b => b.Id).HasName("PrimaryKey_UserId");
+
             if (File.Exists("Users.json"))
             {
                 var users = JsonSerializer.Deserialize<List<User>>(File.ReadAllText("Users.json"));
-                modelBuilder.Entity<User>().HasData(users);
+                if (users != null)
+                {
+                    modelBuilder.Entity<User>().HasData(users);
+                }
             }
+
+            modelBuilder.Entity<Tour>().HasKey(b => b.Id).HasName("PrimaryKey_TourId");
 
             if (File.Exists("Tours.json"))
             {
                 var tours = JsonSerializer.Deserialize<List<Tour>>(File.ReadAllText("Tours.json"));
-                modelBuilder.Entity<Tour>().HasData(tours);
+                if (tours != null)
+                {
+                    modelBuilder.Entity<Tour>().HasData(tours);
+                }
             }
         }
 
-        public void Initialize()
-        {
-            Database.EnsureDeleted();
-            Database.EnsureCreated();
-        }
-
-        public async Task SaveChangesAndWriteToJsonAsync()
+        public async Task SaveChangesToJson()
         {
             await SaveChangesAsync();
 

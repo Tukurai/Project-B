@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 
 namespace Depot.DAL;
 
-public class JsonDataProvider<T> : IDataProvider<T> where T : ISerializeable
+public class JsonDataProvider<T> : IDataProvider<T> where T : DbEntity
 {
     public List<T> Data { get; private set; } = [];
     public string FilePath { get;}

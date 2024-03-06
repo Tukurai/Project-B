@@ -2,7 +2,7 @@
 
 namespace Depot.DAL;
 
-public interface IDataProvider<T> where T : ISerializeable
+public class IDataProvider<T> where T : DbEntity
 {
     protected List<T> Data { get;}
     

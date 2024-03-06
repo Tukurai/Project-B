@@ -24,10 +24,24 @@ class Program
         var rondleidingMaken = new SubMenu('1', "Rondleiding maken", "Rondleidingen aanmaken voor morgen.", CreateTours);
         consoleMenu.AddMenuItem(rondleidingMaken);
 
+        var rondleidingBekijken = new SubMenu('2', "Rondleiding bekijken", "Rondleidingen bekijken.", ViewTours);
+        consoleMenu.AddMenuItem(rondleidingBekijken);
+
         consoleMenu.Show();
     }
 
-    private static void CreateTours()
+    private static void ViewTours()
+    {
+        var tours = depotContext.Tours.ToList();
+        foreach (var tour in tours)
+        {
+            Console.WriteLine($"Rondleiding om {tour.Start}.");
+        }
+        Console.WriteLine("Druk op enter om terug naar het hoofdmenu te gaan.");
+        Console.ReadLine();
+    }
+
+    private static async void CreateTours()
     {
         Console.WriteLine("Hoe laat beginnen de rondleidingen morgen?");
         var beginTijd = GetTime();
@@ -52,7 +66,7 @@ class Program
         {
             Console.WriteLine($"Rondleiding aangemaakt voor {tour.Start}.");
         }
-        depotContext.SaveChanges();
+        await depotContext.SaveChangesToJson();
 
         Console.WriteLine("Druk op enter om terug naar het hoofdmenu te gaan.");
         consoleMenu?.Reset();

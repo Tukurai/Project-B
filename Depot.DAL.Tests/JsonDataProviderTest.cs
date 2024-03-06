@@ -55,6 +55,6 @@ public class JsonDataProviderTests
 
         // Assert
         var actualData = JsonConvert.DeserializeObject<List<MockSerializeable>>(File.ReadAllText(_filePath));
-        Assert.AreEqual(expectedData[0].Id, actualData![0].Id);
+        Assert.IsTrue(expectedData[0].Id == actualData![0].Id);
     }
 }
