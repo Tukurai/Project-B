@@ -1,6 +1,4 @@
-﻿
-
-namespace Depot.Common.Navigation
+﻿namespace Depot.Common.Navigation
 {
     public class Menu
     {
