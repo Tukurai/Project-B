@@ -14,7 +14,8 @@ class Program
 
     static void Main(string[] args)
     {
-        Console.WriteLine("Hello, World!");
+        Console.WriteLine("Loading context data");
+        depotContext.LoadJson();
 
         consoleMenu = new Menu("Afdelingshoofd", "Maak uw keuze uit het menu hieronder:");
 
@@ -41,7 +42,7 @@ class Program
         Console.ReadLine();
     }
 
-    private static async void CreateTours()
+    private static void CreateTours()
     {
         Console.WriteLine("Hoe laat beginnen de rondleidingen morgen?");
         var beginTijd = GetTime();
@@ -66,7 +67,7 @@ class Program
         {
             Console.WriteLine($"Rondleiding aangemaakt voor {tour.Start}.");
         }
-        await depotContext.SaveChangesToJson();
+        depotContext.SaveChanges();
 
         Console.WriteLine("Druk op enter om terug naar het hoofdmenu te gaan.");
         consoleMenu?.Reset();
