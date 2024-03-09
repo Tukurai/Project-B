@@ -19,13 +19,13 @@ class Program
 
         consoleMenu = new Menu("Afdelingshoofd", "Maak uw keuze uit het menu hieronder:");
 
-        var afsluiten = new SubMenu('0', "Afsluiten", "Sluit het programma.", Close);
+        var afsluiten = new Menu('0', "Afsluiten", "Sluit het programma.", Close);
         consoleMenu.AddMenuItem(afsluiten);
 
-        var rondleidingMaken = new SubMenu('1', "Rondleiding maken", "Rondleidingen aanmaken voor morgen.", CreateTours);
+        var rondleidingMaken = new Menu('1', "Rondleiding maken", "Rondleidingen aanmaken voor morgen.", CreateTours);
         consoleMenu.AddMenuItem(rondleidingMaken);
 
-        var rondleidingBekijken = new SubMenu('2', "Rondleiding bekijken", "Rondleidingen bekijken.", ViewTours);
+        var rondleidingBekijken = new Menu('2', "Rondleiding bekijken", "Rondleidingen bekijken.", ViewTours);
         consoleMenu.AddMenuItem(rondleidingBekijken);
 
         consoleMenu.Show();

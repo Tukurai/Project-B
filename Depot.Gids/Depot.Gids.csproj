@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Depot.Common\Depot.Common.csproj" />
+    <ProjectReference Include="..\Depot.DAL\Depot.DAL.csproj" />
   </ItemGroup>
 
 </Project>
