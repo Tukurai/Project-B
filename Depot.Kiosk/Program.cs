@@ -15,21 +15,20 @@ class Program
 
         consoleMenu = new Menu("Kiosk", "Maak uw keuze uit het menu hieronder:");
 
-        var afsluiten = new SubMenu('0', "Afsluiten", "Sluit het programma.", Close);
+        var afsluiten = new Menu('0', "Afsluiten", "Sluit het programma.", Close);
         consoleMenu.AddMenuItem(afsluiten);
 
-        var reserveren = new SubMenu('1', "Reservering maken", "Maak een reservering voor een rondleiding.", StartReservation);
+        var reserveren = new Menu('1', "Reservering maken", "Maak een reservering voor een rondleiding.", StartReservation);
         consoleMenu.AddMenuItem(reserveren);
 
-        var annuleren = new SubMenu('2', "Reservering annuleren", "Annuleer een reservering voor een rondleiding.", CancelReservation);
+        var annuleren = new Menu('2', "Reservering annuleren", "Annuleer een reservering voor een rondleiding.", CancelReservation);
         consoleMenu.AddMenuItem(annuleren);
 
-        var testSubmenu = new SubMenu('3', "Extra menu", "Hier vind je nog meer opties.");
-        testSubmenu.AddMenuItem(new SubMenu('1', "Test", "Dit is een test.", () => { Console.WriteLine("AAB 1"); Console.ReadLine(); }));
-        testSubmenu.AddMenuItem(new SubMenu('2', "Test", "Dit is een test.", () => { Console.WriteLine("AAB 2"); Console.ReadLine(); }));
-        testSubmenu.AddMenuItem(new SubMenu('3', "Test", "Dit is een test.", () => { Console.WriteLine("AAB 3"); Console.ReadLine(); }));
-        testSubmenu.AddMenuItem(new SubMenu('4', "Test", "Dit is een test.", () => { Console.WriteLine("AAB 4"); Console.ReadLine(); }));
-        testSubmenu.AddMenuItem(new SubMenu('5', "Terug", "Terug naar het hoofdmenu.", () => { Console.WriteLine("AAB 4"); Console.ReadLine(); consoleMenu?.Reset(); }));
+        var testSubmenu = new Menu('3', "Extra menu", "Hier vind je nog meer opties.");
+        testSubmenu.AddMenuItem(new Menu('1', "Test", "Dit is een test.", () => { Console.WriteLine("AAB 1"); Console.ReadLine(); }));
+        testSubmenu.AddMenuItem(new Menu('2', "Test", "Dit is een test.", () => { Console.WriteLine("AAB 2"); Console.ReadLine(); }));
+        testSubmenu.AddMenuItem(new Menu('3', "Test", "Dit is een test.", () => { Console.WriteLine("AAB 3"); Console.ReadLine(); }));
+        testSubmenu.AddMenuItem(new Menu('4', "Test", "Dit is een test.", () => { Console.WriteLine("AAB 4"); Console.ReadLine(); }));
         consoleMenu.AddMenuItem(testSubmenu);
 
         consoleMenu.Show();

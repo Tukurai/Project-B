@@ -1,11 +1,7 @@
 ﻿using Depot.Common.Navigation;
 using Depot.DAL;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.IO;
-using System.Text.Json;
-using Newtonsoft.Json;
 
 namespace Depot.Gids;
 
@@ -26,7 +22,7 @@ class Program
             var afsluiten = new SubMenu('0', "Afsluiten", "Sluit het programma.", Close);
             consoleMenu.AddMenuItem(afsluiten);
 
-            var bekijken1 = new SubMenu('1', "Rondleidingen bekijken", "Rondleiding 1 bekijken", GetTour);
+            var bekijken1 = new SubMenu('1', "Rondleidingen bekijken", "Rondleiding 1 bekijken", () => { GetTour(1); });
             consoleMenu.AddMenuItem(bekijken1);
 
             consoleMenu.Show();
@@ -50,15 +46,17 @@ class Program
 
             if (!int.TryParse(enteredBarcode, out int userId) || userId < 1)
             {
-                if (!depotContext.Users.Where(u => u.Id == userId).Any())
-                {
-                    Console.SetCursorPosition(0, Console.CursorTop - 1);
-                    Console.WriteLine("Ongeldige invoer.");
-                }    
+                var user = depotContext.Users.Where(u => u.Id == userId).FirstOrDefault();
+                if (user != null)
+                { 
+                    Console.WriteLine($"Welkom {user.Name}.");
+                    return true;
+                }
+
+                Console.SetCursorPosition(0, Console.CursorTop - 1);
+                Console.WriteLine("Ongeldige invoer.");
             }
         } while (true);
-
-        return true;
     }
 
     private static void GetTour(int tourNr)
