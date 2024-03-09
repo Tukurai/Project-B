@@ -12,8 +12,10 @@ class Program
 
     static void Main(string[] args)
     {
+        Console.WriteLine("Loading context data");
         depotContext.LoadJson();
-        Console.WriteLine("Hello, World! Please login to the Depot.");
+
+        Console.WriteLine("Please login to the Depot:");
 
         if (Login())
         {

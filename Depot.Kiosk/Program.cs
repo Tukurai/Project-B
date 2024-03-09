@@ -8,10 +8,12 @@ namespace Depot.Kiosk;
 class Program
 {
     private static Menu? consoleMenu;
+    private static DepotContext depotContext = new DepotContext();
 
     static void Main(string[] args)
     {
-        Console.WriteLine("Hello, World!");
+        Console.WriteLine("Loading context data");
+        depotContext.LoadJson();
 
         consoleMenu = new Menu("Kiosk", "Maak uw keuze uit het menu hieronder:");
 
