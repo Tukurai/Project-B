@@ -55,7 +55,10 @@ class Program
             ticketNumbers.Add(UserInput.GetNumber("Wat is uw Ticketnummer?", min: 1));
         }
 
-        ReserveTour(tourId, ticketNumbers);
+        if (CheckReservations(ticketNumbers) == true)
+        {
+            ReserveTour(tourId, ticketNumbers);
+        }
     }
 
     private static void CancelReservation()
@@ -63,6 +66,24 @@ class Program
         var ticketNumber = UserInput.GetNumber("Wat is uw Ticketnummer?", min: 1);
 
         CancelTour(ticketNumber);
+    }
+
+    private static bool CheckReservations(List<int> ticketNumbers)
+    {
+        foreach (var tour in depotContext.Tours)
+        {
+            if (tour.Registrations.Any(registration => ticketNumbers.Any(ticketNumber => registration == ticketNumber)) == true)
+            {
+                Console.WriteLine("1 of meerdere tickets zijn al geregistreerd bij een andere rondleiding.");
+                Console.WriteLine("Druk op enter om terug naar het hoofdmenu te gaan.");
+                consoleMenu?.Reset();
+                Console.ReadLine();
+
+                return false;
+            }
+        }
+
+        return true;
     }
 
     private static void ReserveTour(int tourId, List<int> ticketNumbers)
