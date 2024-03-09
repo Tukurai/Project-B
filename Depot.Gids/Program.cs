@@ -19,10 +19,10 @@ class Program
         {
             consoleMenu = new Menu("Gids", "Maak uw keuze uit de rondleidingen hieronder: ");
 
-            var afsluiten = new SubMenu('0', "Afsluiten", "Sluit het programma.", Close);
+            var afsluiten = new Menu('0', "Afsluiten", "Sluit het programma.", Close);
             consoleMenu.AddMenuItem(afsluiten);
 
-            var bekijken1 = new SubMenu('1', "Rondleidingen bekijken", "Rondleiding 1 bekijken", () => { GetTour(1); });
+            var bekijken1 = new Menu('1', "Rondleidingen bekijken", "Rondleiding 1 bekijken", () => { GetTour(1); });
             consoleMenu.AddMenuItem(bekijken1);
 
             consoleMenu.Show();
@@ -63,9 +63,9 @@ class Program
     {
         var tour = depotContext.Tours.Where(t => t.Id == tourNr).FirstOrDefault();
 
-        Console.WriteLine($"Rondleiding {tour.Id}: {tour.Start}");
+        Console.WriteLine($"Rondleiding {tour?.Id}: {tour?.Start}");
         Console.WriteLine("Alle geregistreerde bezoekers voor deze rondleiding: ");
-        foreach (var ticketnummer in tour.Registrations)
+        foreach (var ticketnummer in tour?.Registrations)
         {
             Console.WriteLine($"Bezoeker {ticketnummer}");
         }
