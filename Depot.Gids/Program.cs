@@ -1,6 +1,8 @@
 ﻿using Depot.Common.Navigation;
 using Depot.DAL;
+using Depot.DAL.Models;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Depot.Gids;
@@ -17,18 +19,45 @@ class Program
 
         Console.WriteLine("Please login to the Depot:");
 
-        if (Login())
-        {
-            consoleMenu = new Menu("Gids", "Maak uw keuze uit de rondleidingen hieronder: ");
-
-            var afsluiten = new Menu('0', "Afsluiten", "Sluit het programma.", Close);
-            consoleMenu.AddMenuItem(afsluiten);
-
-            var bekijken1 = new Menu('1', "Rondleidingen bekijken", "Rondleiding 1 bekijken", () => { GetTour(1); });
-            consoleMenu.AddMenuItem(bekijken1);
+        if (true) //(Login())
+        { 
+            consoleMenu = new PagingMenu("Gids", "Maak uw keuze uit de rondleidingen hieronder: ", CreateTourList());
 
             consoleMenu.Show();
         }
+    }
+
+    private static List<Menu> CreateTourList()
+    {
+        var resultTours = new List<Menu>();
+        var index = 3;
+
+        depotContext.Tours.ToList().ForEach(t =>
+        {
+            var tourDetailsMenuItem = new Menu(index.ToString()[0], $"Tour {t.Id}", $"{t.Start}, reserveringen: {t.Registrations.Count}, wachtlijst {t.Queue.Count}", null, consoleMenu);
+            tourDetailsMenuItem.AddMenuItem(new Menu('1', "Bekijk details", "Bekijk details van deze rondleiding.", () => { GetTour(t.Id); }, tourDetailsMenuItem));
+            tourDetailsMenuItem.AddMenuItem(new Menu('2', "Toevoegen bezoeker", "Een bezoeker toevoegen aan deze rondleiding.", () => { AddVisitor(t.Id); }, tourDetailsMenuItem));
+            tourDetailsMenuItem.AddMenuItem(new Menu('3', "Verwijderen bezoeker", "Een bezoeker verwijderen van deze rondleiding.", () => { RemoveVisitor(t.Id); }, tourDetailsMenuItem));
+
+            resultTours.Add(tourDetailsMenuItem);
+            index++;
+            if (index == 10)
+            {
+                index = 3;
+            }
+        });
+
+        return resultTours;
+    }
+
+    private static void RemoveVisitor(int tourId)
+    {
+        throw new NotImplementedException();
+    }
+
+    private static void AddVisitor(int tourId)
+    {
+        throw new NotImplementedException();
     }
 
     private static void Close()
@@ -78,10 +107,7 @@ class Program
         {
             Console.WriteLine($"Bezoeker {ticketnummer}");
         }
-
-        // Andere opties toevoegen, verwijderen, inchecken
-        Console.WriteLine("Druk op enter om terug naar het hoofdmenu te gaan.");
-        consoleMenu?.Reset();
+        Console.WriteLine($"Druk op enter om terug te gaan.");
         Console.ReadLine();
     }
 }
