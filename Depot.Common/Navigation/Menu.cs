@@ -87,14 +87,16 @@
 
         private void AddStandardOptions()
         {
-            if (Parent == null)
-            {
-                Options.Add(new Menu('0', "Terug", $"Afsluiten.", () => { Environment.Exit(0); }));
-            } else {
-                Options.Add(new Menu('0', "Terug", $"Terug naar {Parent.Title}.", () => { ActiveItem = Parent; }));
-            }
+            // if (Parent == null)
+            // {
+            //     Options.Add(new Menu('0', "Terug", $"Afsluiten.", () => { Environment.Exit(0); }));
+            // } 
+            // else if (Action == null)
+            // {
+            //     Options.Add(new Menu('0', "Terug", $"Terug naar {Parent.Title}.", () => { ActiveItem = Parent; }));
+            // }
 
-            AddAdditionalOptions();
+            // AddAdditionalOptions();
         }
 
         protected virtual void AddAdditionalOptions() {}

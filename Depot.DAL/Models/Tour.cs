@@ -9,5 +9,5 @@ namespace Depot.DAL.Models
         public List<int> Registrations { get; set; } = new List<int>();
         public List<int> Queue { get; set; } = new List<int>();
     }
-    
+
 }

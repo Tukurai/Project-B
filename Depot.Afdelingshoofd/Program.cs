@@ -19,8 +19,8 @@ class Program
 
         consoleMenu = new Menu("Afdelingshoofd", "Maak uw keuze uit het menu hieronder:");
 
-        var afsluiten = new Menu('0', "Afsluiten", "Sluit het programma.", Close);
-        consoleMenu.AddMenuItem(afsluiten);
+        // var afsluiten = new Menu('0', "Afsluiten", "Sluit het programma.", Close);
+        // consoleMenu.AddMenuItem(afsluiten);
 
         var rondleidingMaken = new Menu('1', "Rondleiding maken", "Rondleidingen aanmaken voor morgen.", CreateTours);
         consoleMenu.AddMenuItem(rondleidingMaken);
