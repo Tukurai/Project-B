@@ -1,2 +1,27 @@
-﻿{
-}
+[
+  {
+    "Role": 0,
+    "Name": "Jeroen",
+    "Id": 1
+  },
+  {
+    "Role": 0,
+    "Name": "Nina",
+    "Id": 2
+  },
+  {
+    "Role": 0,
+    "Name": "Marijn",
+    "Id": 3
+  },
+  {
+    "Role": 0,
+    "Name": "Salih",
+    "Id": 4
+  },
+  {
+    "Role": 0,
+    "Name": "Frans",
+    "Id": 5
+  }
+]

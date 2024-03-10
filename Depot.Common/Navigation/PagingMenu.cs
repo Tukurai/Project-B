@@ -6,20 +6,24 @@ namespace Depot.Common.Navigation
     {
         public int PageNumber { get; set; }
         public int MaxItemsPerPage { get; set; }
-        public IEnumerable<Menu[]> Pages { get; private set; }
+        public IEnumerable<Menu[]> Pages { get; private set; } = new List<Menu[]>();
 
-        public PagingMenu(string title, string description, List<Menu> listItems, Menu? parent = null) : base(title, description, parent)
+        public PagingMenu(string title, string description, Menu? parent = null) : base(title, description, parent)
         {
             PageNumber = 0;
             MaxItemsPerPage = 7;
-            Pages = listItems.Chunk(MaxItemsPerPage);
         }
 
-        public PagingMenu(char keyChar, string title, string description, List<Menu> listItems, Action? action = null, Menu? parent = null)
-            : this(title, description, listItems, parent)
+        public PagingMenu(char keyChar, string title, string description, Action? action = null, Menu? parent = null)
+            : this(title, description, parent)
         {
             KeyChar = keyChar;
             Action = action;
+        }
+
+        public void SetListItems(List<Menu> listItems)
+        {
+            Pages = listItems.Chunk(MaxItemsPerPage);
         }
 
         public override void AddMenuItem(Menu navigationItem)
@@ -56,9 +60,12 @@ namespace Depot.Common.Navigation
 
                 if (ActiveItem.GetType() == typeof(PagingMenu))
                 {
-                    foreach (var item in Pages.Skip(PageNumber).First())
+                    if (Pages.Any())
                     {
-                        Console.WriteLine($"{item.KeyChar}. {item.Title} | {item.Description}");
+                        foreach (var item in Pages.Skip(PageNumber).First())
+                        {
+                            Console.WriteLine($"{item.KeyChar}. {item.Title} | {item.Description}");
+                        }
                     }
                 }
 
@@ -70,7 +77,7 @@ namespace Depot.Common.Navigation
                 var selectedOption = ActiveItem.Options.Find(x => x.KeyChar == input);
                 if (selectedOption == null && int.TryParse(input.ToString(), out int indexSelected))
                 {
-                    selectedOption = Pages.Skip(PageNumber).First().Skip(indexSelected-3).First();
+                    selectedOption = Pages.Skip(PageNumber).First().Skip(indexSelected - 3).First();
                 }
 
                 if (selectedOption != null)

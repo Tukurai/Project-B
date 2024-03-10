@@ -1,4 +1,5 @@
 ﻿using Depot.Common.Navigation;
+using Depot.Common.Validation;
 using Depot.DAL;
 using System;
 using System.Collections.Generic;
@@ -44,13 +45,13 @@ class Program
 
     private static void StartReservation()
     {
-        var amountOfTickets = GetAmountOfTickets();
+        var amountOfTickets = UserInput.GetNumber("Hoeveel plaatsen wilt u reserveren? Voor elke plek wordt een ticketnummer gevraagd. (Maximaal 13)", 0, 13);
         var tourId = GetTour();
 
         List<int> ticketNumbers = new List<int>();
         for (int i = 0; i < amountOfTickets; i++)
         {
-            ticketNumbers.Add(GetTicketNumber());
+            ticketNumbers.Add(UserInput.GetNumber("Wat is uw Ticketnummer?", min: 1));
         }
 
         ReserveTour(tourId, ticketNumbers);
@@ -58,7 +59,7 @@ class Program
 
     private static void CancelReservation()
     {
-        var ticketNumber = GetTicketNumber();
+        var ticketNumber = UserInput.GetNumber("Wat is uw Ticketnummer?", min: 1);
 
         CancelTour(ticketNumber);
     }
@@ -128,40 +129,6 @@ class Program
             }
 
             return tourId;
-        } while (true);
-    }
-
-    private static int GetAmountOfTickets()
-    {
-        Console.WriteLine("Hoeveel plaatsen wilt u reserveren? Voor elke plek wordt een ticketnummer gevraagd. (Maximaal 13)");
-        do
-        {
-            string amountString = Console.ReadLine() ?? "";
-
-            if (!int.TryParse(amountString, out int amount) || amount > 13 || amount < 1)
-            {
-                Console.SetCursorPosition(0, Console.CursorTop - 1);
-                Console.WriteLine("Ongeldige invoer.");
-            }
-
-            return amount;
-        } while (true);
-    }
-
-    private static int GetTicketNumber()
-    {
-        Console.WriteLine("Wat is uw Ticketnummer?");
-        do
-        {
-            string ticketString = Console.ReadLine() ?? "";
-
-            if (!int.TryParse(ticketString, out int ticketNumber) || ticketNumber < 1)
-            {
-                Console.SetCursorPosition(0, Console.CursorTop - 1);
-                Console.WriteLine("Ongeldige invoer.");
-            }
-
-            return ticketNumber;
         } while (true);
     }
 }
