@@ -2,6 +2,7 @@
 using Depot.Common.Validation;
 using Depot.DAL;
 using Depot.DAL.Models;
+using Depot.DAL.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,6 +13,7 @@ class Program
 {
     private static Menu? consoleMenu;
     private static DepotContext depotContext = new DepotContext();
+    private static int MaxReservations = 13;
 
     static void Main(string[] args)
     {
@@ -116,6 +118,10 @@ class Program
         Console.WriteLine("Druk op enter om terug naar het hoofdmenu te gaan.");
         consoleMenu?.Reset();
         Console.ReadLine();
+        if (CheckReservations(ticketNumbers) == true)
+        {
+            ReserveTour(tourId, ticketNumbers);
+        }
     }
 
     private static void CancelReservation()
@@ -170,10 +176,15 @@ class Program
         Console.ReadLine();
     }
 
-    private static Tour GetTour(int amountOfTickets)
+    private static int GetTour(int amountOfTickets)
     {
-        var today = DateTime.Now;
-        var todaysTours = depotContext.Tours.Where(t => t.Start.DayOfYear == today.DayOfYear && t.Start.Year == today.Year).ToList();
+        // var tours = depotContext.Tours.Where(q => q.Start.Date == DateTime.Now.AddDays(1).Date).ToList();
+        var tours = depotContext.Tours.ToList();
+
+        Console.WriteLine();
+        foreach (var tour in tours)
+        {
+            string tourTime = tour.Start.ToString("HH:mm");
 
         Console.WriteLine("Rondleidingen van vandaag:");
         for (int i = 0; i < todaysTours.Count; i++)
