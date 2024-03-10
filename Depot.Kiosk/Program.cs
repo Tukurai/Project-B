@@ -64,11 +64,18 @@ class Program
         var amountOfTickets = UserInput.GetNumber($"Hoeveel plaatsen wilt u reserveren? Voor elke plek wordt een ticketnummer gevraagd. (Maximaal {maxReservations})", 0, maxReservations);
         bool wachtlijst = false;
         bool retry = false;
-        Tour tour;
+        Tour? tour;
 
         do
         {
             tour = GetTour(amountOfTickets);
+            if (tour == null)
+            {
+                Console.WriteLine("Druk op enter om terug naar het hoofdmenu te gaan.");
+                consoleMenu?.Reset();
+                Console.ReadLine();
+                return;
+            }
 
             if (maxReservations - (tour.Registrations.Count + amountOfTickets) < 0)
             {
@@ -170,10 +177,16 @@ class Program
         Console.ReadLine();
     }
 
-    private static Tour GetTour(int amountOfTickets)
+    private static Tour? GetTour(int amountOfTickets)
     {
         var today = DateTime.Now;
         var todaysTours = depotContext.Tours.Where(t => t.Start.DayOfYear == today.DayOfYear && t.Start.Year == today.Year).ToList();
+
+        if (todaysTours.Count <= 0)
+        {
+            Console.WriteLine("Er zijn vandaag geen rondleidingen.");
+            return null;
+        }
 
         Console.WriteLine("Rondleidingen van vandaag:");
         for (int i = 0; i < todaysTours.Count; i++)
