@@ -2,7 +2,6 @@
 using Depot.Common.Validation;
 using Depot.DAL;
 using Depot.DAL.Models;
-using Depot.DAL.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,7 +12,6 @@ class Program
 {
     private static Menu? consoleMenu;
     private static DepotContext depotContext = new DepotContext();
-    private static int MaxReservations = 13;
 
     static void Main(string[] args)
     {
@@ -118,10 +116,6 @@ class Program
         Console.WriteLine("Druk op enter om terug naar het hoofdmenu te gaan.");
         consoleMenu?.Reset();
         Console.ReadLine();
-        if (CheckReservations(ticketNumbers) == true)
-        {
-            ReserveTour(tourId, ticketNumbers);
-        }
     }
 
     private static void CancelReservation()
@@ -176,15 +170,10 @@ class Program
         Console.ReadLine();
     }
 
-    private static int GetTour(int amountOfTickets)
+    private static Tour GetTour(int amountOfTickets)
     {
-        // var tours = depotContext.Tours.Where(q => q.Start.Date == DateTime.Now.AddDays(1).Date).ToList();
-        var tours = depotContext.Tours.ToList();
-
-        Console.WriteLine();
-        foreach (var tour in tours)
-        {
-            string tourTime = tour.Start.ToString("HH:mm");
+        var today = DateTime.Now;
+        var todaysTours = depotContext.Tours.Where(t => t.Start.DayOfYear == today.DayOfYear && t.Start.Year == today.Year).ToList();
 
         Console.WriteLine("Rondleidingen van vandaag:");
         for (int i = 0; i < todaysTours.Count; i++)
@@ -203,52 +192,4 @@ class Program
 
         return todaysTours[tourIndex];
     }
-
-
-    //private static int GetTour(int amountOfTickets)
-    //{
-    //    // var tours = depotContext.Tours.Where(q => q.Start.Date == DateTime.Now.AddDays(1).Date).ToList();
-    //    var tours = depotContext.Tours.ToList();
-
-    //    do
-    //    {
-    //        Console.WriteLine();
-    //        foreach (var tour in tours)
-    //        {
-    //            string tourTime = tour.Start.ToString("HH:mm");
-
-    //            if (amountOfTickets > MaxReservations - tour.Registrations.Count)
-    //            {
-    //                Console.ForegroundColor = ConsoleColor.Red;
-    //            }
-    //            else
-    //            {
-    //                Console.ForegroundColor = ConsoleColor.Green;
-    //            }
-
-    //            Console.WriteLine($"{tour.Id}. {tourTime} - Vrije plekken: {MaxReservations - tour.Registrations.Count}");
-    //            Console.ResetColor();
-    //        }
-
-
-    //        int tourNumber = UserInput.GetNumber("Welke rondleiding wilt u reserveren?", 1, tours.Count);
-
-    //        if (amountOfTickets > MaxReservations - tours[tourNumber - 1].Registrations.Count)
-    //        {
-    //            Console.WriteLine("De rondleiding heeft niet genoeg vrije plekken om de inschrijving te voltooien.\n");
-    //            int userInput = UserInput.GetNumber("Maak een keuze:\n1. Andere reservering kiezen\n2. Terug naar het hoofdmenu", 1, 2);
-
-    //            if (userInput == 2)
-    //            {
-    //                // Return 0 when user wants to return to the main menu
-    //                return 0;
-    //            }
-    //        }
-    //        else
-    //        {
-    //            return tourNumber;
-    //        }
-    //    }
-    //    while (true);
-    //}
 }
