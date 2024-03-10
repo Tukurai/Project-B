@@ -11,6 +11,7 @@ class Program
 {
     private static Menu? consoleMenu;
     private static DepotContext depotContext = new DepotContext();
+    private static int MaxReservations = 13;
 
     static void Main(string[] args)
     {
@@ -46,7 +47,7 @@ class Program
     private static void StartReservation()
     {
         var amountOfTickets = UserInput.GetNumber("Hoeveel plaatsen wilt u reserveren? Voor elke plek wordt een ticketnummer gevraagd. (Maximaal 13)", 0, 13);
-        var tourId = GetTour();
+        var tourId = GetTour(amountOfTickets);
 
         List<int> ticketNumbers = new List<int>();
         for (int i = 0; i < amountOfTickets; i++)
@@ -54,7 +55,10 @@ class Program
             ticketNumbers.Add(UserInput.GetNumber("Wat is uw Ticketnummer?", min: 1));
         }
 
-        ReserveTour(tourId, ticketNumbers);
+        if (CheckReservations(ticketNumbers) == true)
+        {
+            ReserveTour(tourId, ticketNumbers);
+        }
     }
 
     private static void CancelReservation()
@@ -64,8 +68,30 @@ class Program
         CancelTour(ticketNumber);
     }
 
+    private static bool CheckReservations(List<int> ticketNumbers)
+    {
+        foreach (var tour in depotContext.Tours)
+        {
+            if (tour.Registrations.Any(registration => ticketNumbers.Any(ticketNumber => registration == ticketNumber)) == true)
+            {
+                Console.WriteLine("1 of meerdere tickets zijn al geregistreerd bij een andere rondleiding.");
+                Console.WriteLine("Druk op enter om terug naar het hoofdmenu te gaan.");
+                consoleMenu?.Reset();
+                Console.ReadLine();
+
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     private static void ReserveTour(int tourId, List<int> ticketNumbers)
     {
+        //Write tour reservation(s) to the JSON data
+        depotContext.Tours.FirstOrDefault(tour => tour.Id == tourId)!.Registrations.AddRange(ticketNumbers);
+        depotContext.SaveChanges();
+
         Console.WriteLine($"Uw reservering is geplaatst voor tour {tourId}, met {ticketNumbers.Count()} mensen.");
         Console.WriteLine("Druk op enter om terug naar het hoofdmenu te gaan.");
         consoleMenu?.Reset();
@@ -104,31 +130,27 @@ class Program
         }
     }
 
-    private static int GetTour()
+    private static int GetTour(int amountOfTickets)
     {
-        Console.WriteLine("Welke rondleiding wilt u reserveren?");
-        Console.WriteLine("1. Rondleiding 9:00");
-        Console.WriteLine("2. Rondleiding 10:00");
-        Console.WriteLine("3. Rondleiding 11:00");
-        Console.WriteLine("4. Rondleiding 12:00");
-        Console.WriteLine("5. Rondleiding 13:00");
-        Console.WriteLine("6. Rondleiding 14:00");
-        Console.WriteLine("7. Rondleiding 15:00");
-        Console.WriteLine("8. Rondleiding 16:00");
-        Console.WriteLine("9. Rondleiding 17:00");
-        Console.WriteLine("10. Rondleiding 18:00");
+        // var tours = depotContext.Tours.Where(q => q.Start.Date == DateTime.Now.AddDays(1).Date).ToList();
+        var tours = depotContext.Tours.ToList();
 
-        do
+        Console.WriteLine();
+        foreach (var tour in tours)
         {
-            string tourString = Console.ReadLine() ?? "";
+            string tourTime = tour.Start.ToString("HH:mm");
 
-            if (!int.TryParse(tourString, out int tourId) || tourId > 10 || tourId < 1)
+            if (amountOfTickets > MaxReservations - tour.Registrations.Count)
             {
-                Console.SetCursorPosition(0, Console.CursorTop - 1);
-                Console.WriteLine("Ongeldige invoer.");
+                Console.ForegroundColor = ConsoleColor.Red;
+            } else {
+                Console.ForegroundColor = ConsoleColor.Green;
             }
+            
+            Console.WriteLine($"{tour.Id}. {tourTime} - Vrije plekken: {MaxReservations - tour.Registrations.Count}");
+            Console.ResetColor();
+        }
 
-            return tourId;
-        } while (true);
+        return UserInput.GetNumber("Welke rondleiding wilt u reserveren?", 1, tours.Count);
     }
 }
