@@ -141,6 +141,7 @@ class Program
             string tourTime = tour.Start.ToString("HH:mm");
             Console.WriteLine($"{tour.Id}. {tourTime} - Vrije plekken: {MaxReservations - tour.Registrations.Count}");
         }
+        } while (true);
 
         return UserInput.GetNumber("Welke rondleiding wilt u reserveren?", 1, tours.Count);
     }
