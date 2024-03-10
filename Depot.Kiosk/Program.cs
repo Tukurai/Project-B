@@ -83,7 +83,7 @@ class Program
             if (response == "y")
             {
                 reservation.Registrations.Remove(ticketNumber);
-                StartReservation();
+                StartReservation(ticketNumber);
             }
             else
             {
@@ -219,6 +219,7 @@ class Program
             tour.Registrations.AddRange(ticketNumbers);
             Console.WriteLine($"Uw reservering is geplaatst voor tour {tour.Id}, met {ticketNumbers.Count()} mensen.");
         }
+        depotContext.SaveChanges();
 
         Console.WriteLine("Druk op enter om terug naar het hoofdmenu te gaan.");
         consoleMenu?.Reset();
