@@ -47,7 +47,16 @@ class Program
     private static void StartReservation()
     {
         var amountOfTickets = UserInput.GetNumber("Hoeveel plaatsen wilt u reserveren? Voor elke plek wordt een ticketnummer gevraagd. (Maximaal 13)", 0, 13);
-        var tourId = GetTour(amountOfTickets);
+        int tourId = GetTour(amountOfTickets);
+
+        // GetTour returns 0 when user wants to return to the main menu.
+        if (tourId == 0)
+        {
+            Console.WriteLine("Druk op enter om terug naar het hoofdmenu te gaan.");
+            consoleMenu?.Reset();
+            Console.ReadLine();
+            return;
+        }
 
         List<int> ticketNumbers = new List<int>();
         for (int i = 0; i < amountOfTickets; i++)
@@ -55,9 +64,24 @@ class Program
             ticketNumbers.Add(UserInput.GetNumber("Wat is uw Ticketnummer?", min: 1));
         }
 
-        if (CheckReservations(ticketNumbers) == true)
+        Dictionary<int, int> ticketReservations = GetReservations(ticketNumbers);
+        if (ticketReservations.Count == 0)
         {
             ReserveTour(tourId, ticketNumbers);
+        }
+        else
+        {
+            Console.WriteLine("1 of meerdere tickets zijn al geregistreerd bij een andere rondleiding: ");
+
+            foreach (KeyValuePair<int, int> keyValue in ticketReservations)
+            {
+                Console.WriteLine($"Nr: {keyValue.Key} gereserveerd bij Tour: {keyValue.Value}");
+            }
+
+            Console.WriteLine("Annuleer eerst de reservering(en) om voor een nieuwe rondleiding in te schrijven.");
+            Console.WriteLine("Druk op enter om terug naar het hoofdmenu te gaan.");
+            consoleMenu?.Reset();
+            Console.ReadLine();
         }
     }
 
@@ -68,22 +92,22 @@ class Program
         CancelTour(ticketNumber);
     }
 
-    private static bool CheckReservations(List<int> ticketNumbers)
+    private static Dictionary<int, int> GetReservations(List<int> ticketNumbers)
     {
+        Dictionary<int, int> ticketRegistrations = new();
+
         foreach (var tour in depotContext.Tours)
         {
-            if (tour.Registrations.Any(registration => ticketNumbers.Any(ticketNumber => registration == ticketNumber)) == true)
+            foreach (int ticketNumber in ticketNumbers)
             {
-                Console.WriteLine("1 of meerdere tickets zijn al geregistreerd bij een andere rondleiding.");
-                Console.WriteLine("Druk op enter om terug naar het hoofdmenu te gaan.");
-                consoleMenu?.Reset();
-                Console.ReadLine();
-
-                return false;
+                if (tour.Registrations.Contains(ticketNumber))
+                {
+                    ticketRegistrations[ticketNumber] = tour.Id;
+                }
             }
         }
 
-        return true;
+        return ticketRegistrations;
     }
 
     private static void ReserveTour(int tourId, List<int> ticketNumbers)
@@ -101,6 +125,8 @@ class Program
     private static void CancelTour(int ticketNumber)
     {
         // TODO: Get tour reservation data here...
+
+
         // -- bool set to true for testing
         bool foundReservation = true;
 
@@ -113,6 +139,7 @@ class Program
             if (userInput == "y")
             {
                 // TODO: Cancel tour here, remove from json data...
+
                 Console.WriteLine($"Uw reservering voor (tourId) van (tijd) is geannuleerd.");
             }
             else
@@ -135,22 +162,45 @@ class Program
         // var tours = depotContext.Tours.Where(q => q.Start.Date == DateTime.Now.AddDays(1).Date).ToList();
         var tours = depotContext.Tours.ToList();
 
-        Console.WriteLine();
-        foreach (var tour in tours)
+        do
         {
-            string tourTime = tour.Start.ToString("HH:mm");
-
-            if (amountOfTickets > MaxReservations - tour.Registrations.Count)
+            Console.WriteLine();
+            foreach (var tour in tours)
             {
-                Console.ForegroundColor = ConsoleColor.Red;
-            } else {
-                Console.ForegroundColor = ConsoleColor.Green;
-            }
-            
-            Console.WriteLine($"{tour.Id}. {tourTime} - Vrije plekken: {MaxReservations - tour.Registrations.Count}");
-            Console.ResetColor();
-        }
+                string tourTime = tour.Start.ToString("HH:mm");
 
-        return UserInput.GetNumber("Welke rondleiding wilt u reserveren?", 1, tours.Count);
+                if (amountOfTickets > MaxReservations - tour.Registrations.Count)
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                }
+                else
+                {
+                    Console.ForegroundColor = ConsoleColor.Green;
+                }
+
+                Console.WriteLine($"{tour.Id}. {tourTime} - Vrije plekken: {MaxReservations - tour.Registrations.Count}");
+                Console.ResetColor();
+            }
+
+
+            int tourNumber = UserInput.GetNumber("Welke rondleiding wilt u reserveren?", 1, tours.Count);
+
+            if (amountOfTickets > MaxReservations - tours[tourNumber - 1].Registrations.Count)
+            {
+                Console.WriteLine("De rondleiding heeft niet genoeg vrije plekken om de inschrijving te voltooien.\n");
+                int userInput = UserInput.GetNumber("Maak een keuze:\n1. Andere reservering kiezen\n2. Terug naar het hoofdmenu", 1, 2);
+
+                if (userInput == 2)
+                {
+                    // Return 0 when user wants to return to the main menu
+                    return 0;
+                }
+            }
+            else
+            {
+                return tourNumber;
+            }
+        }
+        while (true);
     }
 }
