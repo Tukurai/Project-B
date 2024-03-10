@@ -1,4 +1,6 @@
-﻿using Depot.Common.Navigation;
+﻿using Depot.Common;
+using Depot.Common.Navigation;
+using Depot.Common.Validation;
 using Depot.DAL;
 using Depot.DAL.Models;
 using System;
@@ -9,7 +11,7 @@ namespace Depot.Gids;
 
 class Program
 {
-    private static Menu? consoleMenu;
+    private static PagingMenu? consoleMenu;
     private static DepotContext depotContext = new DepotContext();
 
     static void Main(string[] args)
@@ -17,11 +19,10 @@ class Program
         Console.WriteLine("Loading context data");
         depotContext.LoadJson();
 
-        Console.WriteLine("Please login to the Depot:");
-
-        if (true) //(Login())
-        { 
-            consoleMenu = new PagingMenu("Gids", "Maak uw keuze uit de rondleidingen hieronder: ", CreateTourList());
+        if (GetAccount(out User? user))
+        {
+            consoleMenu = new PagingMenu($"Gids ({user.Name})", "Maak uw keuze uit de rondleidingen hieronder: ");
+            consoleMenu.SetListItems(CreateTourList());
 
             consoleMenu.Show();
         }
@@ -38,6 +39,7 @@ class Program
             tourDetailsMenuItem.AddMenuItem(new Menu('1', "Bekijk details", "Bekijk details van deze rondleiding.", () => { GetTour(t.Id); }, tourDetailsMenuItem));
             tourDetailsMenuItem.AddMenuItem(new Menu('2', "Toevoegen bezoeker", "Een bezoeker toevoegen aan deze rondleiding.", () => { AddVisitor(t.Id); }, tourDetailsMenuItem));
             tourDetailsMenuItem.AddMenuItem(new Menu('3', "Verwijderen bezoeker", "Een bezoeker verwijderen van deze rondleiding.", () => { RemoveVisitor(t.Id); }, tourDetailsMenuItem));
+            tourDetailsMenuItem.AddReturnOrShutdown();
 
             resultTours.Add(tourDetailsMenuItem);
             index++;
@@ -60,36 +62,6 @@ class Program
         throw new NotImplementedException();
     }
 
-    private static void Close()
-    {
-        if (consoleMenu != null)
-        {
-            consoleMenu.IsShowing = false;
-        }
-    }
-
-    private static bool Login()
-    {
-        Console.WriteLine("Enter your barcode to log in: ");
-        do
-        {
-            string enteredBarcode = Console.ReadLine() ?? "";
-
-            if (!int.TryParse(enteredBarcode, out int userId) || userId < 1)
-            {
-                var user = depotContext.Users.Where(u => u.Id == userId).FirstOrDefault();
-                if (user != null)
-                { 
-                    Console.WriteLine($"Welkom {user.Name}.");
-                    return true;
-                }
-
-                Console.SetCursorPosition(0, Console.CursorTop - 1);
-                Console.WriteLine("Ongeldige invoer.");
-            }
-        } while (true);
-    }
-
     private static void GetTour(int tourNr)
     {
         var tour = depotContext.Tours.Where(t => t.Id == tourNr).FirstOrDefault();
@@ -109,5 +81,22 @@ class Program
         }
         Console.WriteLine($"Druk op enter om terug te gaan.");
         Console.ReadLine();
+    }
+
+    private static bool GetAccount(out User? user)
+    {
+        do
+        {
+            var userId = UserInput.GetNumber("Wat is uw gebruiker ID?", 1);
+
+            user = depotContext.Users.Where(u => u.Id == userId).FirstOrDefault();
+            if (user != null)
+            {
+                return true;
+            }
+
+            Console.SetCursorPosition(0, Console.CursorTop - 1);
+            Console.WriteLine("Ongeldige invoer.");
+        } while (true);
     }
 }

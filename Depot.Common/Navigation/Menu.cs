@@ -72,7 +72,7 @@
                     {
                         ActiveItem = selectedOption;
                     }
-                    
+
                     if (selectedOption.Action != null)
                     {
                         selectedOption.Action();
@@ -102,7 +102,7 @@
             Environment.Exit(0);
         }
 
-        protected void AddStandardOptions()
+        public void AddStandardOptions()
         {
             foreach (var option in Options)
             {
@@ -113,7 +113,7 @@
             AddAdditionalOptions();
         }
 
-        protected virtual void AddReturnOrShutdown()
+        public virtual void AddReturnOrShutdown()
         {
             if (Parent == null)
             {
