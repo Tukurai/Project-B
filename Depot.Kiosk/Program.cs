@@ -2,6 +2,7 @@
 using Depot.Common.Validation;
 using Depot.DAL;
 using Depot.DAL.Models;
+using Depot.DAL.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -48,6 +49,7 @@ class Program
     private static void StartReservation()
     {
         var amountOfTickets = UserInput.GetNumber("Hoeveel plaatsen wilt u reserveren? Voor elke plek wordt een ticketnummer gevraagd. (Maximaal 13)", 0, 13);
+        var tourObj = GetTour(amountOfTickets);
         var tourId = GetTour(amountOfTickets);
 
         List<int> ticketNumbers = new List<int>();
@@ -56,6 +58,15 @@ class Program
             ticketNumbers.Add(UserInput.GetNumber("Wat is uw Ticketnummer?", min: 1));
         }
 
+        foreach (var ticketNumber in ticketNumbers)
+        {
+            tourObj.Registrations.Add(ticketNumber);
+        }
+
+        Console.WriteLine($"Uw reservering is geplaatst voor tour {tourObj.Id}, met {ticketNumbers.Count()} mensen.");
+        Console.WriteLine("Druk op enter om terug naar het hoofdmenu te gaan.");
+        consoleMenu?.Reset();
+        Console.ReadLine();
         if (CheckReservations(ticketNumbers) == true)
         {
             ReserveTour(tourId, ticketNumbers);
