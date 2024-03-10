@@ -1,4 +1,8 @@
-﻿namespace Depot.Common.Navigation
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace Depot.Common.Navigation
 {
     public class Menu
     {
