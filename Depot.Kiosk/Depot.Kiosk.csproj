@@ -6,7 +6,7 @@
     <ImplicitUsings>disable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <BaseOutputPath>..\bin</BaseOutputPath>
-    <BaseIntermediateOutputPath>..\obj</BaseIntermediateOutputPath>
+    <BaseIntermediateOutputPath>obj\</BaseIntermediateOutputPath>
   </PropertyGroup>
 
   <ItemGroup>
