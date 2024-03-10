@@ -18,9 +18,6 @@ class Program
 
         consoleMenu = new Menu("Kiosk", "Maak uw keuze uit het menu hieronder:");
 
-        var afsluiten = new Menu('0', "Afsluiten", "Sluit het programma.", Close);
-        consoleMenu.AddMenuItem(afsluiten);
-
         var reserveren = new Menu('1', "Reservering maken", "Maak een reservering voor een rondleiding.", StartReservation);
         consoleMenu.AddMenuItem(reserveren);
 

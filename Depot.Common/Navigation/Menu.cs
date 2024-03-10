@@ -18,8 +18,6 @@
             Description = description;
             Parent = parent;
             ActiveItem = this;
-
-            AddStandardOptions();
         }
 
 
@@ -47,6 +45,8 @@
 
         public virtual void Show()
         {
+            AddStandardOptions();
+
             IsShowing = true;
             do
             {
@@ -57,7 +57,7 @@
 
                 foreach (var item in ActiveItem.Options)
                 {
-                    Console.WriteLine($"{item.KeyChar}. {item.Title}");
+                    Console.WriteLine($"{item.KeyChar}. {item.Title} | {item.Description}");
                 }
 
                 Console.WriteLine();
@@ -68,11 +68,12 @@
                 var selectedOption = ActiveItem.Options.Find(x => x.KeyChar == input);
                 if (selectedOption != null)
                 {
-                    if (selectedOption.Action == null)
+                    if (selectedOption.Options.Any())
                     {
                         ActiveItem = selectedOption;
                     }
-                    else
+                    
+                    if (selectedOption.Action != null)
                     {
                         selectedOption.Action();
                     }
@@ -85,18 +86,49 @@
             ActiveItem = this;
         }
 
-        private void AddStandardOptions()
+        public virtual void Return()
         {
-            if (Parent == null)
+            var mainMenu = this;
+            while (mainMenu.Parent != null)
             {
-                Options.Add(new Menu('0', "Terug", $"Afsluiten.", () => { Environment.Exit(0); }));
-            } else {
-                Options.Add(new Menu('0', "Terug", $"Terug naar {Parent.Title}.", () => { ActiveItem = Parent; }));
+                mainMenu = mainMenu.Parent;
             }
 
+            mainMenu.ActiveItem = ActiveItem?.Parent;
+        }
+
+        public virtual void Shutdown()
+        {
+            Environment.Exit(0);
+        }
+
+        protected void AddStandardOptions()
+        {
+            foreach (var option in Options)
+            {
+                option.AddStandardOptions();
+            }
+
+            AddReturnOrShutdown();
             AddAdditionalOptions();
         }
 
-        protected virtual void AddAdditionalOptions() {}
+        protected virtual void AddReturnOrShutdown()
+        {
+            if (Parent == null)
+            {
+                Options.Add(new Menu('0', "Afsluiten", $"Applicatie afsluiten.", Shutdown, this));
+                return;
+            }
+
+            if (Options.Any())
+            {
+                Options.Add(new Menu('0', "Terug", $"Terug naar {Parent.Title}.", Return, this));
+            }
+        }
+
+        protected virtual void AddAdditionalOptions()
+        {
+        }
     }
 }

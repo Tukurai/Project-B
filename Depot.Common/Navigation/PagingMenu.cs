@@ -1,19 +1,21 @@
-﻿namespace Depot.Common.Navigation
+﻿using System.Text;
+
+namespace Depot.Common.Navigation
 {
-    public class PagingMenu<T> : Menu
+    public class PagingMenu : Menu
     {
-        public List<T> ListItems { get; set; }
         public int PageNumber { get; set; }
         public int MaxItemsPerPage { get; set; }
+        public IEnumerable<Menu[]> Pages { get; private set; }
 
-        public PagingMenu(string title, string description, List<T> listItems, Menu? parent = null) : base(title, description, parent)
+        public PagingMenu(string title, string description, List<Menu> listItems, Menu? parent = null) : base(title, description, parent)
         {
-            ListItems = listItems;
-            PageNumber = 1;
+            PageNumber = 0;
             MaxItemsPerPage = 7;
+            Pages = listItems.Chunk(MaxItemsPerPage);
         }
 
-        public PagingMenu(char keyChar, string title, string description, List<T> listItems, Action? action = null, Menu? parent = null)
+        public PagingMenu(char keyChar, string title, string description, List<Menu> listItems, Action? action = null, Menu? parent = null)
             : this(title, description, listItems, parent)
         {
             KeyChar = keyChar;
@@ -37,6 +39,8 @@
 
         public override void Show()
         {
+            AddStandardOptions();
+
             IsShowing = true;
             do
             {
@@ -45,10 +49,17 @@
                 Console.WriteLine(ActiveItem.Description);
                 Console.WriteLine();
 
-
                 foreach (var item in ActiveItem.Options)
                 {
-                    Console.WriteLine($"{item.KeyChar}. {item.Title}");
+                    Console.WriteLine($"{item.KeyChar}. {item.Title} | {item.Description}");
+                }
+
+                if (ActiveItem.GetType() == typeof(PagingMenu))
+                {
+                    foreach (var item in Pages.Skip(PageNumber).First())
+                    {
+                        Console.WriteLine($"{item.KeyChar}. {item.Title} | {item.Description}");
+                    }
                 }
 
                 Console.WriteLine();
@@ -57,23 +68,50 @@
                 Console.WriteLine();
 
                 var selectedOption = ActiveItem.Options.Find(x => x.KeyChar == input);
+                if (selectedOption == null && int.TryParse(input.ToString(), out int indexSelected))
+                {
+                    selectedOption = Pages.Skip(PageNumber).First().Skip(indexSelected-3).First();
+                }
+
                 if (selectedOption != null)
                 {
-                    if (selectedOption.Action == null)
+                    if (selectedOption.Options.Any())
                     {
                         ActiveItem = selectedOption;
                     }
-                    else
+
+                    if (selectedOption.Action != null)
                     {
                         selectedOption.Action();
                     }
                 }
+
             } while (IsShowing);
         }
 
         protected override void AddAdditionalOptions()
         {
-            //TODO: Add paging options
+            Options.Add(new Menu('1', "Vorige", $"Vorige items bekijken uit de lijst.", Previous, this));
+            Options.Add(new Menu('2', "Volgende", $"Volgende items bekijken uit de lijst.", Next, this));
+        }
+
+        private void Previous()
+        {
+            PageNumber--;
+            if (PageNumber < 0)
+            {
+                PageNumber = 0;
+            }
+        }
+
+        private void Next()
+        {
+            PageNumber++;
+            var pageCount = Pages.Count() - 1; // Zero based
+            if (PageNumber >= pageCount)
+            {
+                PageNumber = pageCount;
+            }
         }
     }
 }
