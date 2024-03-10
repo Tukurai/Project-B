@@ -23,7 +23,10 @@ class Program
         var reserveren = new Menu('1', "Reservering maken", "Maak een reservering voor een rondleiding.", StartReservation);
         consoleMenu.AddMenuItem(reserveren);
 
-        var annuleren = new Menu('2', "Reservering annuleren", "Annuleer een reservering voor een rondleiding.", CancelReservation);
+        var wijzigen = new Menu('2', "Reservering wijzigen", "Wijzig een reservering voor een rondleiding.", EditReservation);
+        consoleMenu.AddMenuItem(wijzigen);
+
+        var annuleren = new Menu('3', "Reservering annuleren", "Annuleer een reservering voor een rondleiding.", CancelReservation);
         consoleMenu.AddMenuItem(annuleren);
 
         var testSubmenu = new Menu('3', "Extra menu", "Hier vind je nog meer opties.");
@@ -82,6 +85,21 @@ class Program
             Console.WriteLine("Druk op enter om terug naar het hoofdmenu te gaan.");
             consoleMenu?.Reset();
             Console.ReadLine();
+        }
+    }
+
+    private static void EditReservation()
+    {
+        int ticketNumber = UserInput.GetNumber("Wat is uw Ticketnummer?", min: 1);
+
+        var reservation = GetReservations(new List<int>() {ticketNumber});
+        if (reservation.Count == 0)
+        {
+            Console.WriteLine("Geen reservering gevonden voor dit ticketnummer");
+        }
+        else
+        {
+            Console.WriteLine("Reservering gevonden: Rondleiding {poep} om {scoop uur}");
         }
     }
 
