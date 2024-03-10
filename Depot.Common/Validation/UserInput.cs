@@ -29,9 +29,9 @@ namespace Depot.Common.Validation
                 {
                     Console.SetCursorPosition(0, Console.CursorTop - 1);
                     Console.WriteLine("Ongeldige invoer.");
+                } else {
+                    return amount;
                 }
-
-                return amount;
             } while (true);
         }
 
