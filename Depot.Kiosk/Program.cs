@@ -1,6 +1,7 @@
 ﻿using Depot.Common.Navigation;
 using Depot.Common.Validation;
 using Depot.DAL;
+using Depot.DAL.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -46,7 +47,7 @@ class Program
     private static void StartReservation()
     {
         var amountOfTickets = UserInput.GetNumber("Hoeveel plaatsen wilt u reserveren? Voor elke plek wordt een ticketnummer gevraagd. (Maximaal 13)", 0, 13);
-        var tourId = GetTour();
+        var tourObj = GetTour(amountOfTickets);
 
         List<int> ticketNumbers = new List<int>();
         for (int i = 0; i < amountOfTickets; i++)
@@ -54,7 +55,15 @@ class Program
             ticketNumbers.Add(UserInput.GetNumber("Wat is uw Ticketnummer?", min: 1));
         }
 
-        ReserveTour(tourId, ticketNumbers);
+        foreach (var ticketNumber in ticketNumbers)
+        {
+            tourObj.Registrations.Add(ticketNumber);
+        }
+
+        Console.WriteLine($"Uw reservering is geplaatst voor tour {tourObj.Id}, met {ticketNumbers.Count()} mensen.");
+        Console.WriteLine("Druk op enter om terug naar het hoofdmenu te gaan.");
+        consoleMenu?.Reset();
+        Console.ReadLine();
     }
 
     private static void CancelReservation()
@@ -62,14 +71,6 @@ class Program
         var ticketNumber = UserInput.GetNumber("Wat is uw Ticketnummer?", min: 1);
 
         CancelTour(ticketNumber);
-    }
-
-    private static void ReserveTour(int tourId, List<int> ticketNumbers)
-    {
-        Console.WriteLine($"Uw reservering is geplaatst voor tour {tourId}, met {ticketNumbers.Count()} mensen.");
-        Console.WriteLine("Druk op enter om terug naar het hoofdmenu te gaan.");
-        consoleMenu?.Reset();
-        Console.ReadLine();
     }
 
     private static void CancelTour(int ticketNumber)
@@ -104,31 +105,21 @@ class Program
         }
     }
 
-    private static int GetTour()
+    private static Tour GetTour(int amountOfTickets)
     {
-        Console.WriteLine("Welke rondleiding wilt u reserveren?");
-        Console.WriteLine("1. Rondleiding 9:00");
-        Console.WriteLine("2. Rondleiding 10:00");
-        Console.WriteLine("3. Rondleiding 11:00");
-        Console.WriteLine("4. Rondleiding 12:00");
-        Console.WriteLine("5. Rondleiding 13:00");
-        Console.WriteLine("6. Rondleiding 14:00");
-        Console.WriteLine("7. Rondleiding 15:00");
-        Console.WriteLine("8. Rondleiding 16:00");
-        Console.WriteLine("9. Rondleiding 17:00");
-        Console.WriteLine("10. Rondleiding 18:00");
+        var today = DateTime.Now;
+        var todaysTours = depotContext.Tours.Where(t => t.Start.DayOfYear == today.DayOfYear && t.Start.Year == today.Year).ToList();
 
-        do
+        Console.WriteLine("Rondleidingen van vandaag:");
+        for (int i = 0; i < todaysTours.Count; i++)
         {
-            string tourString = Console.ReadLine() ?? "";
+            int vrijePlekken = 13 - todaysTours[i].Registrations.Count;
+            bool ruimte = vrijePlekken >= amountOfTickets;
 
-            if (!int.TryParse(tourString, out int tourId) || tourId > 10 || tourId < 1)
-            {
-                Console.SetCursorPosition(0, Console.CursorTop - 1);
-                Console.WriteLine("Ongeldige invoer.");
-            }
+            Console.WriteLine($"{i} Rondleiding {todaysTours[i].Id}: {todaysTours[i].Start}. ({vrijePlekken} plekken vrij) (plek vrij {ruimte})");
+        }
 
-            return tourId;
-        } while (true);
+        int tourIndex = UserInput.GetNumber("Welke rondleiding wilt u reserveren?", 0, todaysTours.Count - 1);
+        return todaysTours[tourIndex];
     }
 }
