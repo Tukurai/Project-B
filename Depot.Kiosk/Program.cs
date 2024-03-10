@@ -139,7 +139,16 @@ class Program
         foreach (var tour in tours)
         {
             string tourTime = tour.Start.ToString("HH:mm");
+
+            if (amountOfTickets > MaxReservations - tour.Registrations.Count)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+            } else {
+                Console.ForegroundColor = ConsoleColor.Green;
+            }
+            
             Console.WriteLine($"{tour.Id}. {tourTime} - Vrije plekken: {MaxReservations - tour.Registrations.Count}");
+            Console.ResetColor();
         }
 
         return UserInput.GetNumber("Welke rondleiding wilt u reserveren?", 1, tours.Count);
