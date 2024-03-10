@@ -20,7 +20,7 @@ class Program
 
         consoleMenu = new Menu("Kiosk", "Maak uw keuze uit het menu hieronder:");
 
-        var reserveren = new Menu('1', "Reservering maken", "Maak een reservering voor een rondleiding.", StartReservation);
+        var reserveren = new Menu('1', "Reservering maken", "Maak een reservering voor een rondleiding.", () => { StartReservation(); });
         consoleMenu.AddMenuItem(reserveren);
 
         var wijzigen = new Menu('2', "Reservering wijzigen", "Wijzig een reservering voor een rondleiding.", EditReservation);
@@ -29,7 +29,7 @@ class Program
         var annuleren = new Menu('3', "Reservering annuleren", "Annuleer een reservering voor een rondleiding.", CancelReservation);
         consoleMenu.AddMenuItem(annuleren);
 
-        var bekijken = new Menu('3', "Reservering bekijken", "Bekijk uw reservering.", ViewReservation);
+        var bekijken = new Menu('4', "Reservering bekijken", "Bekijk uw reservering.", ViewReservation);
         consoleMenu.AddMenuItem(bekijken);
 
         consoleMenu.Show();
@@ -55,6 +55,10 @@ class Program
         {
             Console.WriteLine($"U staat op de wachtlijst voor rondleiding ({queue.Id}) van ({queue.Start}).");
         }
+
+        Console.WriteLine("Druk op enter om terug naar het hoofdmenu te gaan.");
+        consoleMenu?.Reset();
+        Console.ReadLine();
     }
 
     private static void EditReservation()
@@ -65,6 +69,10 @@ class Program
         if (reservation == null)
         {
             Console.WriteLine("Geen reservering gevonden voor dit ticketnummer");
+            Console.WriteLine("Druk op enter om terug naar het hoofdmenu te gaan.");
+            consoleMenu?.Reset();
+            Console.ReadLine();
+            return;
         }
         else
         {
