@@ -51,15 +51,53 @@ class Program
 
         return resultTours;
     }
-
     private static void RemoveVisitor(int tourId)
     {
-        throw new NotImplementedException();
-    }
+        int ticketNummer = UserInput.GetNumber("Wat is het ticketnummer van de bezoeker?", 1);
+        var tour = depotContext.Tours.Where(t => t.Id == tourId).FirstOrDefault();
+        if (tour != null)
+        {
+            if (tour.Registrations.Contains(ticketNummer))
+            {
+                tour.Registrations.Remove(ticketNummer);
+                depotContext.SaveChanges();
+                Console.WriteLine("Bezoeker verwijderd van de rondleiding.");
+                Console.WriteLine($"Druk op enter om terug te gaan.");
+                Console.ReadLine();
+                return;
+            }
 
+            Console.WriteLine("Deze bezoeker is niet geregistreerd voor deze rondleiding.");
+            Console.WriteLine($"Druk op enter om terug te gaan.");
+            Console.ReadLine();
+        }
+    }
     private static void AddVisitor(int tourId)
     {
-        throw new NotImplementedException();
+        int ticketNummer = UserInput.GetNumber("Wat is het ticketnummer van de bezoeker?", 1);
+        var tour = depotContext.Tours.Where(t => t.Id == tourId).FirstOrDefault();
+        if (tour != null)
+        {
+            if (tour.Registrations.Contains(ticketNummer))
+            {
+                Console.WriteLine("Deze bezoeker is al geregistreerd voor deze rondleiding.");
+                Console.WriteLine($"Druk op enter om terug te gaan.");
+                Console.ReadLine();
+                return;
+            }
+
+            if (tour.Queue.Contains(ticketNummer))
+            {
+                Console.WriteLine("Deze bezoeker stond op de wachtlijst en is daar verwijderd.");
+                tour.Queue.Remove(ticketNummer);
+            }
+
+            tour.Registrations.Add(ticketNummer);
+            depotContext.SaveChanges();
+            Console.WriteLine("Bezoeker toegevoegd aan de rondleiding.");
+            Console.WriteLine($"Druk op enter om terug te gaan.");
+            Console.ReadLine();
+        }
     }
 
     private static void GetTour(int tourNr)
