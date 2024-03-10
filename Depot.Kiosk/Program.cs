@@ -1,6 +1,7 @@
 ﻿using Depot.Common.Navigation;
 using Depot.Common.Validation;
 using Depot.DAL;
+using Depot.DAL.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
