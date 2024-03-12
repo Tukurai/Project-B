@@ -58,7 +58,7 @@ namespace Depot.Common.Navigation
 
                 foreach (var item in ActiveItem.Options)
                 {
-                    Console.WriteLine($"{item.KeyChar}. {item.Title} | {item.Description}");
+                    Console.WriteLine($"{item.KeyChar}. {item.Title.PadRight(Globals.Menu_Pad_Right)} | {item.Description}");
                 }
 
                 if (ActiveItem.GetType() == typeof(PagingMenu))
@@ -67,7 +67,7 @@ namespace Depot.Common.Navigation
                     {
                         foreach (var item in Pages.Skip(PageNumber).First())
                         {
-                            Console.WriteLine($"{item.KeyChar}. {item.Title} | {item.Description}");
+                            Console.WriteLine($"{item.KeyChar}. {item.Title.PadRight(Globals.Menu_Pad_Right)} | {item.Description}");
                         }
                     }
                 }

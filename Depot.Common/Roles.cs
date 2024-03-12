@@ -2,7 +2,7 @@
 
 public enum Role
 {
-    Visitor,
-    Guide,
-    Admin,
+    Bezoeker = 0,
+    Gids = 1,
+    Afdelingshoofd = 2,
 }

@@ -16,12 +16,12 @@ class Program
 
     static void Main(string[] args)
     {
-        Console.WriteLine("Loading context data");
+        Console.WriteLine(Localization.Load_context);
         depotContext.LoadJson();
 
-        if (GetAccount(out User? user))
+        if (GetAccount(out User? user, new List<Role> { Role.Gids, Role.Afdelingshoofd }))
         {
-            consoleMenu = new PagingMenu($"Gids ({user.Name})", "Maak uw keuze uit de rondleidingen hieronder: ");
+            consoleMenu = new PagingMenu($"{user.Role} {user.Name}", Localization.Maak_uw_keuze);
             consoleMenu.SetListItems(CreateTourList());
 
             consoleMenu.Show();
@@ -33,12 +33,19 @@ class Program
         var resultTours = new List<Menu>();
         var index = 3;
 
-        depotContext.Tours.ToList().ForEach(t =>
+        var today = DateTime.Now;
+        var todaysTours = depotContext.Tours.Where(t =>
+            t.Start.DayOfYear == today.DayOfYear &&
+            t.Start.Year == today.Year &&
+            t.Start.TimeOfDay > today.TimeOfDay)
+            .OrderBy(q => q.Start).ToList();
+
+        todaysTours.ForEach(t =>
         {
-            var tourDetailsMenuItem = new Menu(index.ToString()[0], $"Tour {t.Id}", $"{t.Start}, reserveringen: {t.Registrations.Count}, wachtlijst {t.Queue.Count}", null, consoleMenu);
-            tourDetailsMenuItem.AddMenuItem(new Menu('1', "Bekijk details", "Bekijk details van deze rondleiding.", () => { GetTour(t.Id); }, tourDetailsMenuItem));
-            tourDetailsMenuItem.AddMenuItem(new Menu('2', "Toevoegen bezoeker", "Een bezoeker toevoegen aan deze rondleiding.", () => { AddVisitor(t.Id); }, tourDetailsMenuItem));
-            tourDetailsMenuItem.AddMenuItem(new Menu('3', "Verwijderen bezoeker", "Een bezoeker verwijderen van deze rondleiding.", () => { RemoveVisitor(t.Id); }, tourDetailsMenuItem));
+            var tourDetailsMenuItem = new Menu(index.ToString()[0], $"{Localization.Rondleidingen_van} {t.Start.ToString("HH:mm")}", $"{Localization.Aanmeldingen}: {t.RegisteredTickets.Count}, {Localization.Gestart}: {(t.Departed ? Localization.Ja : Localization.Nee)}", null, consoleMenu);
+            tourDetailsMenuItem.AddMenuItem(new Menu('1', Localization.Bekijk_details, Localization.Bekijk_details_van_deze_rondleiding, () => { GetTour(t.Id); }, tourDetailsMenuItem));
+            tourDetailsMenuItem.AddMenuItem(new Menu('2', Localization.Toevoegen_bezoeker, Localization.Een_bezoeker_toevoegen_aan_deze_rondleiding, () => { AddVisitor(t.Id); }, tourDetailsMenuItem));
+            tourDetailsMenuItem.AddMenuItem(new Menu('3', Localization.Verwijderen_bezoeker, Localization.Een_bezoeker_verwijderen_van_deze_rondleiding, () => { RemoveVisitor(t.Id); }, tourDetailsMenuItem));
             tourDetailsMenuItem.AddReturnOrShutdown();
 
             resultTours.Add(tourDetailsMenuItem);
@@ -53,49 +60,43 @@ class Program
     }
     private static void RemoveVisitor(int tourId)
     {
-        int ticketNummer = UserInput.GetNumber("Wat is het ticketnummer van de bezoeker?", 1);
+        int ticketNummer = UserInput.GetNumber(Localization.Scan_uw_ticket, 1);
         var tour = depotContext.Tours.Where(t => t.Id == tourId).FirstOrDefault();
         if (tour != null)
         {
-            if (tour.Registrations.Contains(ticketNummer))
+            if (tour.RegisteredTickets.Contains(ticketNummer))
             {
-                tour.Registrations.Remove(ticketNummer);
+                tour.RegisteredTickets.Remove(ticketNummer);
                 depotContext.SaveChanges();
-                Console.WriteLine("Bezoeker verwijderd van de rondleiding.");
-                Console.WriteLine($"Druk op enter om terug te gaan.");
+                Console.WriteLine(Localization.Ticket_verwijderd);
+                Console.WriteLine(Localization.Ga_terug);
                 Console.ReadLine();
                 return;
             }
 
-            Console.WriteLine("Deze bezoeker is niet geregistreerd voor deze rondleiding.");
-            Console.WriteLine($"Druk op enter om terug te gaan.");
+            Console.WriteLine(Localization.Aanmelding_niet_gevonden);
+            Console.WriteLine(Localization.Ga_terug);
             Console.ReadLine();
         }
     }
     private static void AddVisitor(int tourId)
     {
-        int ticketNummer = UserInput.GetNumber("Wat is het ticketnummer van de bezoeker?", 1);
+        int ticketNummer = UserInput.GetNumber(Localization.Scan_uw_ticket, 1);
         var tour = depotContext.Tours.Where(t => t.Id == tourId).FirstOrDefault();
         if (tour != null)
         {
-            if (tour.Registrations.Contains(ticketNummer))
+            if (tour.RegisteredTickets.Contains(ticketNummer))
             {
-                Console.WriteLine("Deze bezoeker is al geregistreerd voor deze rondleiding.");
-                Console.WriteLine($"Druk op enter om terug te gaan.");
+                Console.WriteLine(Localization.Ticket_al_geregistreerd);
+                Console.WriteLine(Localization.Ga_terug);
                 Console.ReadLine();
                 return;
             }
 
-            if (tour.Queue.Contains(ticketNummer))
-            {
-                Console.WriteLine("Deze bezoeker stond op de wachtlijst en is daar verwijderd.");
-                tour.Queue.Remove(ticketNummer);
-            }
-
-            tour.Registrations.Add(ticketNummer);
+            tour.RegisteredTickets.Add(ticketNummer);
             depotContext.SaveChanges();
-            Console.WriteLine("Bezoeker toegevoegd aan de rondleiding.");
-            Console.WriteLine($"Druk op enter om terug te gaan.");
+            Console.WriteLine(Localization.Ticket_toegevoegd);
+            Console.WriteLine(Localization.Ga_terug);
             Console.ReadLine();
         }
     }
@@ -104,37 +105,31 @@ class Program
     {
         var tour = depotContext.Tours.Where(t => t.Id == tourNr).FirstOrDefault();
 
-        Console.WriteLine($"Rondleiding {tour?.Id}: {tour?.Start}");
-        Console.WriteLine("Alle geregistreerde bezoekers voor deze rondleiding: ");
-        foreach (var ticketnummer in tour?.Registrations)
+        Console.WriteLine($"{Localization.Rondleiding_om} {tour?.Start.ToString("HH:mm")}");
+        Console.WriteLine(Localization.Alle_ticketnummers);
+        foreach (var ticketNummer in tour?.RegisteredTickets)
         {
-            Console.WriteLine($"Bezoeker {ticketnummer}");
+            Console.WriteLine($"{Localization.Ticket} {ticketNummer}");
         }
 
-        Console.WriteLine();
-        Console.WriteLine("Alle tickets in de wachtrij voor deze rondleiding: ");
-        foreach (var ticketnummer in tour.Queue)
-        {
-            Console.WriteLine($"Bezoeker {ticketnummer}");
-        }
-        Console.WriteLine($"Druk op enter om terug te gaan.");
+        Console.WriteLine(Localization.Ga_terug);
         Console.ReadLine();
     }
 
-    private static bool GetAccount(out User? user)
+    private static bool GetAccount(out User? user, List<Role> allowedRoles)
     {
         do
         {
-            var userId = UserInput.GetNumber("Wat is uw gebruiker ID?", 1);
+            var userId = UserInput.GetNumber(Localization.Scan_uw_pas, 1);
 
             user = depotContext.Users.Where(u => u.Id == userId).FirstOrDefault();
-            if (user != null)
+            if (user != null && allowedRoles.Contains(user.Role))
             {
                 return true;
             }
 
             Console.SetCursorPosition(0, Console.CursorTop - 1);
-            Console.WriteLine("Ongeldige invoer.");
+            Console.WriteLine(Localization.Ongeldige_invoer);
         } while (true);
     }
 }
