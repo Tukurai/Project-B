@@ -1,26 +1,26 @@
 [
   {
-    "Role": 0,
+    "Role": 1,
     "Name": "Jeroen",
     "Id": 1
   },
   {
-    "Role": 0,
+    "Role": 1,
     "Name": "Nina",
     "Id": 2
   },
   {
-    "Role": 0,
+    "Role": 1,
     "Name": "Marijn",
     "Id": 3
   },
   {
-    "Role": 0,
+    "Role": 1,
     "Name": "Salih",
     "Id": 4
   },
   {
-    "Role": 0,
+    "Role": 2,
     "Name": "Frans",
     "Id": 5
   }

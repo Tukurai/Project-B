@@ -1,4 +1,5 @@
-﻿using Depot.Common.Navigation;
+﻿using Depot.Common;
+using Depot.Common.Navigation;
 using Depot.Common.Validation;
 using Depot.DAL;
 using Depot.DAL.Models;
@@ -15,21 +16,21 @@ class Program
 
     static void Main(string[] args)
     {
-        Console.WriteLine("Loading context data");
+        Console.WriteLine(Localization.Load_context);
         depotContext.LoadJson();
 
-        consoleMenu = new Menu("Kiosk", "Maak uw keuze uit het menu hieronder:");
+        consoleMenu = new Menu(Localization.Kiosk, Localization.Maak_uw_keuze);
 
-        var reserveren = new Menu('1', "Reservering maken", "Maak een reservering voor een rondleiding.", () => { StartReservation(); });
+        var reserveren = new Menu('1', Localization.Reserveren, Localization.Uw_rondleiding_reserveren, () => { StartReservation(); });
         consoleMenu.AddMenuItem(reserveren);
 
-        var wijzigen = new Menu('2', "Reservering wijzigen", "Wijzig een reservering voor een rondleiding.", EditReservation);
+        var wijzigen = new Menu('2', Localization.Wijzigen, Localization.Uw_rondleiding_wijzigen, EditReservation);
         consoleMenu.AddMenuItem(wijzigen);
 
-        var annuleren = new Menu('3', "Reservering annuleren", "Annuleer een reservering voor een rondleiding.", CancelReservation);
+        var annuleren = new Menu('3', Localization.Annuleren, Localization.Uw_rondleiding_annuleren, CancelReservation);
         consoleMenu.AddMenuItem(annuleren);
 
-        var bekijken = new Menu('4', "Reservering bekijken", "Bekijk uw reservering.", ViewReservation);
+        var bekijken = new Menu('4', Localization.Bekijken, Localization.Uw_rondleiding_bekijken, ViewReservation);
         consoleMenu.AddMenuItem(bekijken);
 
         consoleMenu.Show();
@@ -37,58 +38,51 @@ class Program
 
     private static void ViewReservation()
     {
-        var ticketNumber = UserInput.GetNumber("Wat is uw Ticketnummer?", min: 1);
-        var reservation = depotContext.Tours.FirstOrDefault(t => t.Registrations.Contains(ticketNumber));
+        var ticketNumber = UserInput.GetNumber(Localization.Scan_uw_ticket, min: 1);
+        var reservation = depotContext.Tours.FirstOrDefault(t => t.RegisteredTickets.Contains(ticketNumber));
 
         if (reservation != null)
         {
-            Console.WriteLine($"Uw reservering voor rondleiding ({reservation.Id}) van ({reservation.Start}) is gevonden.");
+            Console.WriteLine($"{Localization.Uw_rondleiding_is_om} {reservation.Start.ToString("HH:mm")}.");
         }
         else
         {
-            Console.WriteLine("Geen reservering gevonden voor het opgegeven ticketnummer.");
+            Console.WriteLine(Localization.Aanmelding_niet_gevonden);
         }
 
-        var queue = depotContext.Tours.FirstOrDefault(t => t.Queue.Contains(ticketNumber));
-
-        if (queue != null)
-        {
-            Console.WriteLine($"U staat op de wachtlijst voor rondleiding ({queue.Id}) van ({queue.Start}).");
-        }
-
-        Console.WriteLine("Druk op enter om terug naar het hoofdmenu te gaan.");
+        Console.WriteLine(Localization.Ga_terug);
         consoleMenu?.Reset();
         Console.ReadLine();
     }
 
     private static void EditReservation()
     {
-        int ticketNumber = UserInput.GetNumber("Wat is uw Ticketnummer?", min: 1);
-        var reservation = depotContext.Tours.FirstOrDefault(t => t.Registrations.Contains(ticketNumber));
+        int ticketNumber = UserInput.GetNumber(Localization.Scan_uw_ticket, min: 1);
+        var reservation = depotContext.Tours.FirstOrDefault(t => t.RegisteredTickets.Contains(ticketNumber));
 
         if (reservation == null)
         {
-            Console.WriteLine("Geen reservering gevonden voor dit ticketnummer");
-            Console.WriteLine("Druk op enter om terug naar het hoofdmenu te gaan.");
+            Console.WriteLine(Localization.Aanmelding_niet_gevonden);
+            Console.WriteLine(Localization.Ga_terug);
             consoleMenu?.Reset();
             Console.ReadLine();
             return;
         }
         else
         {
-            Console.WriteLine($"Reservering gevonden: Rondleiding {reservation.Id} om {reservation.Start}");
-            Console.WriteLine("Wilt u deze reservering wijzigen? (y/n)");
+            Console.WriteLine($"{Localization.Uw_rondleiding_is_om} {reservation.Start.ToString("HH:mm")}.");
+            Console.WriteLine(Localization.Reservering_Wijzigen);
             var response = Console.ReadLine();
 
             if (response == "y")
             {
-                reservation.Registrations.Remove(ticketNumber);
+                reservation.RegisteredTickets.Remove(ticketNumber);
                 StartReservation(ticketNumber);
             }
             else
             {
-                Console.WriteLine("Reservering niet gewijzigd.");
-                Console.WriteLine("Druk op enter om terug naar het hoofdmenu te gaan.");
+                Console.WriteLine(Localization.Reservering_niet_gewijzigd);
+                Console.WriteLine(Localization.Ga_terug);
                 consoleMenu?.Reset();
                 Console.ReadLine();
             }
@@ -97,104 +91,52 @@ class Program
 
     private static void CancelReservation()
     {
-        var ticketNumber = UserInput.GetNumber("Wat is uw Ticketnummer?", min: 1);
-        var reservation = depotContext.Tours.FirstOrDefault(t => t.Registrations.Contains(ticketNumber));
+        var ticketNumber = UserInput.GetNumber(Localization.Scan_uw_ticket, min: 1);
+        var reservation = depotContext.Tours.FirstOrDefault(t => t.RegisteredTickets.Contains(ticketNumber));
 
         if (reservation != null)
         {
-            Console.WriteLine($"Reservering voor rondleiding ({reservation.Id}) van ({reservation.Start}) gevonden.");
-            Console.WriteLine("Weet u zeker dat u uw reservering wil annuleren? (y/n)");
+            Console.WriteLine($"{Localization.Uw_rondleiding_is_om} {reservation.Start.ToString("HH:mm")}.");
+            Console.WriteLine(Localization.Annulering_bevestigen);
 
             var userInput = Console.ReadLine() ?? "";
             if (userInput == "y")
             {
-                reservation.Registrations.Remove(ticketNumber);
+                reservation.RegisteredTickets.Remove(ticketNumber);
                 depotContext.SaveChanges();
-                Console.WriteLine($"Uw reservering voor ({reservation.Id}) van ({reservation.Start}) is geannuleerd.");
+                Console.WriteLine(Localization.Reservering_is_geannuleerd);
             }
             else
             {
-                Console.WriteLine("Reservering niet geannuleerd.");
+                Console.WriteLine(Localization.Reservering_niet_geannuleerd);
             }
         }
         else
         {
-            Console.WriteLine("Geen reservering gevonden voor het opgegeven ticketnummer.");
+            Console.WriteLine(Localization.Aanmelding_niet_gevonden);
         }
 
-        var queue = depotContext.Tours.FirstOrDefault(t => t.Queue.Contains(ticketNumber));
-
-        if (queue != null)
-        {
-            Console.WriteLine($"U staat op de wachtlijst voor rondleiding ({queue.Id}) van ({queue.Start}).");
-            Console.WriteLine("Weet u zeker dat u uw wachtlijst reservering wil annuleren? (y/n)");
-
-            var userInput = Console.ReadLine() ?? "";
-            if (userInput == "y")
-            {
-                queue.Queue.Remove(ticketNumber);
-                depotContext.SaveChanges();
-                Console.WriteLine($"Uw wachtlijst reservering voor ({queue.Id}) van ({queue.Start}) is geannuleerd.");
-            }
-            else
-            {
-                Console.WriteLine("Wachtlijst reservering niet geannuleerd.");
-            }
-        }
-
-        Console.WriteLine("Druk op enter om terug naar het hoofdmenu te gaan.");
+        Console.WriteLine(Localization.Ga_terug);
         consoleMenu?.Reset();
         Console.ReadLine();
     }
 
     private static void StartReservation(int? ticketnummer = null)
     {
-        int maxReservations = 13;
         int amountOfTickets = 1;
         if (ticketnummer == null)
         {
-            amountOfTickets = UserInput.GetNumber($"Hoeveel plaatsen wilt u reserveren? Voor elke plek wordt een ticketnummer gevraagd. (Maximaal {maxReservations})", 0, maxReservations);
+            amountOfTickets = UserInput.GetNumber(Localization.Hoeveel_plaatsen_wilt_u_reserveren, 0, Globals.Maximum_Plekken);
         }
-        bool wachtlijst = false;
-        bool retry = false;
-        Tour? tour;
 
-        do
+        Tour? tour = GetTour(amountOfTickets);
+        if (tour == null)
         {
-            tour = GetTour(amountOfTickets);
-            if (tour == null)
-            {
-                Console.WriteLine("Druk op enter om terug naar het hoofdmenu te gaan.");
-                consoleMenu?.Reset();
-                Console.ReadLine();
-                return;
-            }
-
-            if (maxReservations - (tour.Registrations.Count + amountOfTickets) < 0)
-            {
-                Console.WriteLine("De rondleiding heeft niet genoeg vrije plekken om de inschrijving te voltooien.");
-                Console.WriteLine("Dit zijn uw opties:");
-                Console.WriteLine("0. Terug naar het hoofdmenu.");
-                Console.WriteLine("1. Andere reservering kiezen.");
-                Console.WriteLine("2. Aanmelden op de wachtlijst.");
-
-                int userInput = UserInput.GetNumber("Maak uw keuze:", 0, 2);
-
-                switch (userInput)
-                {
-                    case 0:
-                        consoleMenu?.Reset();
-                        Console.ReadLine();
-                        return;
-                    case 1:
-                        retry = true;
-                        break;
-                    case 2:
-                        wachtlijst = true;
-                        break;
-                }
-            }
-        } while (retry);
+            Console.WriteLine(Localization.Ga_terug);
+            consoleMenu?.Reset();
+            Console.ReadLine();
+            return;
+        }
 
         List<int> ticketNumbers = new List<int>();
         if (ticketnummer != null)
@@ -205,23 +147,12 @@ class Program
         {
             for (int i = 0; i < amountOfTickets; i++)
             {
-                ticketNumbers.Add(UserInput.GetNumber("Wat is uw Ticketnummer?", min: 1));
+                ticketNumbers.Add(UserInput.GetNumber(Localization.Scan_uw_ticket, min: 1));
             }
-        }
-
-        if (wachtlijst)
-        {
-            tour.Queue.AddRange(ticketNumbers);
-            Console.WriteLine($"U staat op de wachtlijst voor tour {tour.Id}, met {ticketNumbers.Count()} mensen.");
-        }
-        else
-        {
-            tour.Registrations.AddRange(ticketNumbers);
-            Console.WriteLine($"Uw reservering is geplaatst voor tour {tour.Id}, met {ticketNumbers.Count()} mensen.");
         }
         depotContext.SaveChanges();
 
-        Console.WriteLine("Druk op enter om terug naar het hoofdmenu te gaan.");
+        Console.WriteLine(Localization.Ga_terug);
         consoleMenu?.Reset();
         Console.ReadLine();
     }
@@ -229,27 +160,27 @@ class Program
     private static Tour? GetTour(int amountOfTickets)
     {
         var today = DateTime.Now;
-        var todaysTours = depotContext.Tours.Where(t => t.Start.DayOfYear == today.DayOfYear && t.Start.Year == today.Year).ToList();
+        var todaysTours = depotContext.Tours.Where(t => 
+            t.Start.DayOfYear == today.DayOfYear && 
+            t.Start.Year == today.Year && 
+            t.Start.TimeOfDay > today.TimeOfDay &&
+            (Globals.Maximum_Plekken - t.RegisteredTickets.Count) >= amountOfTickets)
+            .OrderBy(q => q.Start).ToList();
 
         if (todaysTours.Count <= 0)
         {
-            Console.WriteLine("Er zijn vandaag geen rondleidingen.");
+            Console.WriteLine(Localization.Geen_rondleidingen_meer);
             return null;
         }
 
-        Console.WriteLine("Rondleidingen van vandaag:");
+        Console.WriteLine(Localization.Rondleidingen_van_vandaag);
         for (int i = 0; i < todaysTours.Count; i++)
         {
-            int vrijePlekken = 13 - todaysTours[i].Registrations.Count;
-            bool ruimte = vrijePlekken >= amountOfTickets;
-            var ruimteMessage = ruimte ? "Voldoende ruimte" : "Onvoldoende ruimte";
-
-            Console.ForegroundColor = ruimte ? ConsoleColor.Green : ConsoleColor.Red;
-            Console.WriteLine($"{i} Rondleiding {todaysTours[i].Id}: {todaysTours[i].Start}. ({vrijePlekken} plekken vrij) ({ruimteMessage})");
+            Console.WriteLine($"{i}. {Localization.Rondleiding_om} {todaysTours[i].Start.ToString("HH:mm")}");
             Console.ResetColor();
         }
 
-        int tourIndex = UserInput.GetNumber("Welke rondleiding wilt u reserveren?", 0, todaysTours.Count - 1);
+        int tourIndex = UserInput.GetNumber(Localization.Welke_rondleiding_wilt_u_reserveren, 0, todaysTours.Count - 1);
         var tour = todaysTours[tourIndex];
 
         return todaysTours[tourIndex];

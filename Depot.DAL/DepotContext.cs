@@ -14,6 +14,7 @@ namespace Depot.DAL
     {
         public DbSet<User> Users { get; set; }
         public DbSet<Tour> Tours { get; set; }
+        public DbSet<Group> Groups { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -24,6 +25,7 @@ namespace Depot.DAL
         {
             modelBuilder.Entity<User>().HasKey(b => b.Id).HasName("PrimaryKey_UserId");
             modelBuilder.Entity<Tour>().HasKey(b => b.Id).HasName("PrimaryKey_TourId");
+            modelBuilder.Entity<Group>().HasKey(b => b.Id).HasName("PrimaryKey_GroupId");
         }
 
         public async void LoadJson()
@@ -47,6 +49,16 @@ namespace Depot.DAL
                     await SaveChangesAsync();
                 }
             }
+
+            if (File.Exists("Groups.json"))
+            {
+                var groups = JsonSerializer.Deserialize<List<Group>>(File.ReadAllText("Groups.json"));
+                if (groups != null)
+                {
+                    Groups.AddRange(groups);
+                    await SaveChangesAsync();
+                }
+            }
         }
 
         public override int SaveChanges()
@@ -55,6 +67,7 @@ namespace Depot.DAL
 
             File.WriteAllText("Users.json", JsonSerializer.Serialize(Users.ToList()));
             File.WriteAllText("Tours.json", JsonSerializer.Serialize(Tours.ToList()));
+            File.WriteAllText("Groups.json", JsonSerializer.Serialize(Tours.ToList()));
 
             return changes;
         }

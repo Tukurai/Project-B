@@ -28,7 +28,7 @@ namespace Depot.Common.Validation
                 )
                 {
                     Console.SetCursorPosition(0, Console.CursorTop - 1);
-                    Console.WriteLine("Ongeldige invoer.");
+                    Console.WriteLine(Localization.Ongeldige_invoer);
                 } else {
                     return amount;
                 }
@@ -54,7 +54,7 @@ namespace Depot.Common.Validation
                 else
                 {
                     Console.SetCursorPosition(0, Console.CursorTop - 1);
-                    Console.WriteLine("Ongeldige tijd. Hou het formaat 'uren:minuten' aan.");
+                    Console.WriteLine(Localization.Ongeldige_invoer_tijd);
                 }
             } while (true);
         }
