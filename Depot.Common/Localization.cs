@@ -79,5 +79,9 @@ namespace Depot.Common
         public const string Geen_rondleidingen_meer = "Er zijn vandaag geen rondleidingen meer.";
         public const string Rondleidingen_van_vandaag = "Rondleidingen van vandaag:";
         public const string Welke_rondleiding_wilt_u_reserveren = "Welke rondleiding wilt u reserveren?";
+        public const string Ticket_heeft_al_een_reservering = "Dit ticket heeft al een reservering.";
+        public const string Uw_kunt_uw_reservering_niet_meer_aanpassen = "Uw kunt uw reservering niet meer aanpassen.";
+        public const string Uw_kunt_uw_reservering_niet_annuleren = "Uw kunt uw reservering niet wijzigen, laat uw groepsbeheerder dit doen.";
+        public const string Ticket_zit_al_in_uw_groep = "Dit ticket is al toegevoegd aan uw groep";
     }
 }
