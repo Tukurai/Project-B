@@ -11,29 +11,58 @@ namespace Depot.Kiosk;
 
 class Program
 {
-    private static Menu? consoleMenu;
     private static DepotContext depotContext = new DepotContext();
+    private static Menu? consoleMenu;
+
+    public static bool Shutdown { get; set; } = false;
+
+    public static int TicketNumber { get; set; }
 
     static void Main(string[] args)
     {
         Console.WriteLine(Localization.Load_context);
         depotContext.LoadJson();
 
-        consoleMenu = new Menu(Localization.Kiosk, Localization.Maak_uw_keuze);
+        Menu reserveringsMenu = new Menu(Localization.Kiosk, Localization.Maak_uw_keuze);
+        reserveringsMenu.ReplaceShutdown(() =>
+        {
+            reserveringsMenu.IsShowing = false;
+            Console.Clear();
+        });
 
-        var reserveren = new Menu('1', Localization.Reserveren, Localization.Uw_rondleiding_reserveren, () => { StartReservation(); });
-        consoleMenu.AddMenuItem(reserveren);
+        var reserveren = new Menu('1', Localization.Reserveren, Localization.Uw_rondleiding_reserveren, () => { StartReservation(TicketNumber); });
+        reserveringsMenu.AddMenuItem(reserveren);
 
-        var wijzigen = new Menu('2', Localization.Wijzigen, Localization.Uw_rondleiding_wijzigen, EditReservation);
-        consoleMenu.AddMenuItem(wijzigen);
+        Menu beheerReserveringMenu = new Menu(Localization.Kiosk, Localization.Maak_uw_keuze);
+        beheerReserveringMenu.ReplaceShutdown(() =>
+        {
+            beheerReserveringMenu.IsShowing = false;
+            Console.Clear();
+        });
 
-        var annuleren = new Menu('3', Localization.Annuleren, Localization.Uw_rondleiding_annuleren, CancelReservation);
-        consoleMenu.AddMenuItem(annuleren);
+        var wijzigen = new Menu('1', Localization.Wijzigen, Localization.Uw_rondleiding_wijzigen, EditReservation);
+        beheerReserveringMenu.AddMenuItem(wijzigen);
+        var annuleren = new Menu('2', Localization.Annuleren, Localization.Uw_rondleiding_annuleren, CancelReservation);
+        beheerReserveringMenu.AddMenuItem(annuleren);
+        var bekijken = new Menu('3', Localization.Bekijken, Localization.Uw_rondleiding_bekijken, ViewReservation);
+        beheerReserveringMenu.AddMenuItem(bekijken);
 
-        var bekijken = new Menu('4', Localization.Bekijken, Localization.Uw_rondleiding_bekijken, ViewReservation);
-        consoleMenu.AddMenuItem(bekijken);
+        do
+        {
+            TicketNumber = UserInput.GetNumber(Localization.Scan_uw_ticket, 1);
+            var reservation = depotContext.Tours.FirstOrDefault(t => t.RegisteredTickets.Contains(TicketNumber));
 
-        consoleMenu.Show();
+            if (reservation != null)
+            {
+                consoleMenu = beheerReserveringMenu;
+                beheerReserveringMenu.Show();
+            }
+            else
+            {
+                consoleMenu = reserveringsMenu;
+                reserveringsMenu.Show();
+            }
+        } while (!Shutdown);
     }
 
     private static void ViewReservation()
@@ -50,9 +79,7 @@ class Program
             Console.WriteLine(Localization.Aanmelding_niet_gevonden);
         }
 
-        Console.WriteLine(Localization.Ga_terug);
-        consoleMenu?.Reset();
-        Console.ReadLine();
+        ResetMenuState();
     }
 
     private static void EditReservation()
@@ -63,9 +90,8 @@ class Program
         if (reservation == null)
         {
             Console.WriteLine(Localization.Aanmelding_niet_gevonden);
-            Console.WriteLine(Localization.Ga_terug);
-            consoleMenu?.Reset();
-            Console.ReadLine();
+
+            ResetMenuState();
             return;
         }
         else
@@ -82,9 +108,8 @@ class Program
             else
             {
                 Console.WriteLine(Localization.Reservering_niet_gewijzigd);
-                Console.WriteLine(Localization.Ga_terug);
-                consoleMenu?.Reset();
-                Console.ReadLine();
+
+                ResetMenuState();
             }
         }
     }
@@ -116,53 +141,51 @@ class Program
             Console.WriteLine(Localization.Aanmelding_niet_gevonden);
         }
 
-        Console.WriteLine(Localization.Ga_terug);
-        consoleMenu?.Reset();
-        Console.ReadLine();
+        ResetMenuState();
     }
 
-    private static void StartReservation(int? ticketnummer = null)
+    private static void StartReservation(int ticketnummer)
     {
-        int amountOfTickets = 1;
-        if (ticketnummer == null)
-        {
-            amountOfTickets = UserInput.GetNumber(Localization.Hoeveel_plaatsen_wilt_u_reserveren, 0, Globals.Maximum_Plekken);
-        }
+
+        int amountOfTickets = UserInput.GetNumber(Localization.Hoeveel_plaatsen_wilt_u_reserveren, 0, Globals.Maximum_Plekken);
 
         Tour? tour = GetTour(amountOfTickets);
         if (tour == null)
         {
-            Console.WriteLine(Localization.Ga_terug);
-            consoleMenu?.Reset();
-            Console.ReadLine();
+            ResetMenuState();
             return;
         }
 
         List<int> ticketNumbers = new List<int>();
-        if (ticketnummer != null)
+        for (int i = 0; i < amountOfTickets; i++)
         {
-            ticketNumbers.Add(ticketnummer.Value);
+            ticketNumbers.Add(UserInput.GetNumber(Localization.Scan_uw_ticket, min: 1));
         }
-        else
-        {
-            for (int i = 0; i < amountOfTickets; i++)
-            {
-                ticketNumbers.Add(UserInput.GetNumber(Localization.Scan_uw_ticket, min: 1));
-            }
-        }
+        
+        tour.RegisteredTickets.AddRange(ticketNumbers);
         depotContext.SaveChanges();
 
-        Console.WriteLine(Localization.Ga_terug);
-        consoleMenu?.Reset();
-        Console.ReadLine();
+        ResetMenuState();
+    }
+
+    public static void ResetMenuState()
+    {
+        if (consoleMenu != null)
+        {
+            Console.WriteLine(Localization.Ga_terug);
+            consoleMenu.Reset();
+            consoleMenu.IsShowing = false;
+            Console.ReadLine();
+            Console.Clear();
+        }
     }
 
     private static Tour? GetTour(int amountOfTickets)
     {
         var today = DateTime.Now;
-        var todaysTours = depotContext.Tours.Where(t => 
-            t.Start.DayOfYear == today.DayOfYear && 
-            t.Start.Year == today.Year && 
+        var todaysTours = depotContext.Tours.Where(t =>
+            t.Start.DayOfYear == today.DayOfYear &&
+            t.Start.Year == today.Year &&
             t.Start.TimeOfDay > today.TimeOfDay &&
             (Globals.Maximum_Plekken - t.RegisteredTickets.Count) >= amountOfTickets)
             .OrderBy(q => q.Start).ToList();

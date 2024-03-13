@@ -101,8 +101,15 @@ namespace Depot.Common.Navigation
 
         protected override void AddAdditionalOptions()
         {
-            Options.Add(new Menu('1', "Vorige", $"Vorige items bekijken uit de lijst.", Previous, this));
-            Options.Add(new Menu('2', "Volgende", $"Volgende items bekijken uit de lijst.", Next, this));
+            if (!Options.Any(q => q.KeyChar == '1'))
+            {
+                Options.Add(new Menu('1', "Vorige", $"Vorige items bekijken uit de lijst.", Previous, this));
+            }
+
+            if (!Options.Any(q => q.KeyChar == '2'))
+            {
+                Options.Add(new Menu('2', "Volgende", $"Volgende items bekijken uit de lijst.", Next, this));
+            }
         }
 
         private void Previous()

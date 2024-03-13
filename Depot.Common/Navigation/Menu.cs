@@ -15,6 +15,7 @@ namespace Depot.Common.Navigation
 
         public char? KeyChar { get; set; } = null;
         public Action? Action { get; set; } = null;
+        public Action? ShutdownAction { get; set; }
 
         public Menu(string title, string description, Menu? parent = null)
         {
@@ -119,20 +120,28 @@ namespace Depot.Common.Navigation
 
         public virtual void AddReturnOrShutdown()
         {
-            if (Parent == null)
+            if (!Options.Any(q=>q.KeyChar == '0'))
             {
-                Options.Add(new Menu('0', "Afsluiten", $"Applicatie afsluiten.", Shutdown, this));
-                return;
-            }
+                if (Parent == null)
+                {
+                    Options.Add(new Menu('0', "Afsluiten", $"Applicatie afsluiten.", ShutdownAction ?? Shutdown, this));
+                    return;
+                }
 
-            if (Options.Any())
-            {
-                Options.Add(new Menu('0', "Terug", $"Terug naar {Parent.Title}.", Return, this));
+                if (Options.Any())
+                {
+                    Options.Add(new Menu('0', "Terug", $"Terug naar {Parent.Title}.", Return, this));
+                }
             }
         }
 
         protected virtual void AddAdditionalOptions()
         {
+        }
+
+        public void ReplaceShutdown(Action action)
+        {
+            ShutdownAction = action;
         }
     }
 }
