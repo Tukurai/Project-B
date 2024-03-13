@@ -30,7 +30,7 @@ class Program
             Console.Clear();
         });
 
-        var reserveren = new Menu('1', Localization.Reserveren, Localization.Uw_rondleiding_reserveren, () => { StartReservation(TicketNumber); });
+        var reserveren = new Menu('1', Localization.Reserveren, Localization.Uw_rondleiding_reserveren, () => { StartReservation(); });
         reserveringsMenu.AddMenuItem(reserveren);
 
         Menu beheerReserveringMenu = new Menu(Localization.Kiosk, Localization.Maak_uw_keuze);
@@ -84,8 +84,7 @@ class Program
 
     private static void EditReservation()
     {
-        int ticketNumber = UserInput.GetNumber(Localization.Scan_uw_ticket, min: 1);
-        var reservation = depotContext.Tours.FirstOrDefault(t => t.RegisteredTickets.Contains(ticketNumber));
+        var reservation = depotContext.Tours.FirstOrDefault(t => t.RegisteredTickets.Contains(TicketNumber));
 
         if (reservation == null)
         {
@@ -94,60 +93,91 @@ class Program
             ResetMenuState();
             return;
         }
-        else
+
+        if (reservation.Departed)
         {
-            Console.WriteLine($"{Localization.Uw_rondleiding_is_om} {reservation.Start.ToString("HH:mm")}.");
-            Console.WriteLine(Localization.Reservering_Wijzigen);
-            var response = Console.ReadLine();
-
-            if (response == "y")
-            {
-                reservation.RegisteredTickets.Remove(ticketNumber);
-                StartReservation(ticketNumber);
-            }
-            else
-            {
-                Console.WriteLine(Localization.Reservering_niet_gewijzigd);
-
-                ResetMenuState();
-            }
+            Console.WriteLine(Localization.Uw_kunt_uw_reservering_niet_meer_aanpassen);
+            ResetMenuState();
+            return;
         }
-    }
 
-    private static void CancelReservation()
-    {
-        var ticketNumber = UserInput.GetNumber(Localization.Scan_uw_ticket, min: 1);
-        var reservation = depotContext.Tours.FirstOrDefault(t => t.RegisteredTickets.Contains(ticketNumber));
-
-        if (reservation != null)
+        var group = depotContext.Groups.FirstOrDefault(g => g.TicketIds.Contains(TicketNumber));
+        if (group != null && group.GroupOwnerId != TicketNumber)
         {
-            Console.WriteLine($"{Localization.Uw_rondleiding_is_om} {reservation.Start.ToString("HH:mm")}.");
-            Console.WriteLine(Localization.Annulering_bevestigen);
+            Console.WriteLine(Localization.Uw_kunt_uw_reservering_niet_annuleren);
+            ResetMenuState();
+            return;
+        }
 
-            var userInput = Console.ReadLine() ?? "";
-            if (userInput == "y")
-            {
-                reservation.RegisteredTickets.Remove(ticketNumber);
-                depotContext.SaveChanges();
-                Console.WriteLine(Localization.Reservering_is_geannuleerd);
-            }
-            else
-            {
-                Console.WriteLine(Localization.Reservering_niet_geannuleerd);
-            }
+        Console.WriteLine($"{Localization.Uw_rondleiding_is_om} {reservation.Start.ToString("HH:mm")}.");
+        Console.WriteLine(Localization.Reservering_Wijzigen);
+        var response = Console.ReadLine();
+
+        if (response == "y")
+        {
+            group.TicketIds.ForEach(t => reservation.RegisteredTickets.Remove(t));
+            depotContext.Groups.Remove(group);
+
+            StartReservation();
         }
         else
         {
-            Console.WriteLine(Localization.Aanmelding_niet_gevonden);
+            Console.WriteLine(Localization.Reservering_niet_gewijzigd);
+
         }
 
         ResetMenuState();
     }
 
-    private static void StartReservation(int ticketnummer)
+    private static void CancelReservation()
     {
+        var reservation = depotContext.Tours.FirstOrDefault(t => t.RegisteredTickets.Contains(TicketNumber));
 
-        int amountOfTickets = UserInput.GetNumber(Localization.Hoeveel_plaatsen_wilt_u_reserveren, 0, Globals.Maximum_Plekken);
+        if (reservation == null)
+        {
+            Console.WriteLine(Localization.Aanmelding_niet_gevonden);
+            ResetMenuState();
+            return;
+        }
+
+        if (reservation.Departed)
+        {
+            Console.WriteLine(Localization.Uw_kunt_uw_reservering_niet_meer_aanpassen);
+            ResetMenuState();
+            return;
+        }
+
+        var group = depotContext.Groups.FirstOrDefault(g => g.TicketIds.Contains(TicketNumber));
+        if (group != null && group.GroupOwnerId != TicketNumber)
+        {
+            Console.WriteLine(Localization.Uw_kunt_uw_reservering_niet_annuleren);
+            ResetMenuState();
+            return;
+        }
+
+        Console.WriteLine($"{Localization.Uw_rondleiding_is_om} {reservation.Start.ToString("HH:mm")}.");
+        Console.WriteLine(Localization.Annulering_bevestigen);
+
+        var userInput = Console.ReadLine() ?? "";
+        if (userInput == "y")
+        {
+            group.TicketIds.ForEach(t => reservation.RegisteredTickets.Remove(t));
+            depotContext.Groups.Remove(group);
+
+            depotContext.SaveChanges();
+            Console.WriteLine(Localization.Reservering_is_geannuleerd);
+        }
+        else
+        {
+            Console.WriteLine(Localization.Reservering_niet_geannuleerd);
+        }
+
+        ResetMenuState();
+    }
+
+    private static void StartReservation(Group? group = null)
+    {
+        int amountOfTickets = group?.TicketIds.Count ?? UserInput.GetNumber(Localization.Hoeveel_plaatsen_wilt_u_reserveren, 1, Globals.Maximum_Plekken);
 
         Tour? tour = GetTour(amountOfTickets);
         if (tour == null)
@@ -156,12 +186,35 @@ class Program
             return;
         }
 
-        List<int> ticketNumbers = new List<int>();
-        for (int i = 0; i < amountOfTickets; i++)
+        List<int> ticketNumbers = new List<int>() { TicketNumber };
+        if (group != null)
         {
-            ticketNumbers.Add(UserInput.GetNumber(Localization.Scan_uw_ticket, min: 1));
+            ticketNumbers = group.TicketIds;
         }
-        
+
+        while (ticketNumbers.Count < amountOfTickets)
+        {
+            int additionalTicket = UserInput.GetNumber(Localization.Scan_uw_ticket, min: 1);
+            bool hasReservation = depotContext.Tours.Any(tour => tour.RegisteredTickets.Contains(additionalTicket));
+
+            if (hasReservation)
+            {
+                Console.WriteLine(Localization.Ticket_heeft_al_een_reservering);
+                continue;
+            }
+
+            if (ticketNumbers.Contains(additionalTicket))
+            {
+                Console.WriteLine(Localization.Ticket_zit_al_in_uw_groep);
+                continue;
+            }
+
+            ticketNumbers.Add(additionalTicket);
+        }
+
+        var newGroup = new Group() { GroupOwnerId = TicketNumber, TicketIds = ticketNumbers };
+        depotContext.Groups.Add(newGroup);
+
         tour.RegisteredTickets.AddRange(ticketNumbers);
         depotContext.SaveChanges();
 
