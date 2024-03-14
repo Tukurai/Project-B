@@ -60,44 +60,52 @@ class Program
     }
     private static void RemoveVisitor(int tourId)
     {
-        int ticketNummer = UserInput.GetNumber(Localization.Scan_uw_ticket, 1);
+        int? ticketNummer = UserInput.GetNumber(Localization.Scan_uw_ticket, 1);
+        if(ticketNummer == null)
+        {
+            ResetMenuState();
+            return;
+        }
+
         var tour = depotContext.Tours.Where(t => t.Id == tourId).FirstOrDefault();
         if (tour != null)
         {
-            if (tour.RegisteredTickets.Contains(ticketNummer))
+            if (tour.RegisteredTickets.Contains(ticketNummer.Value))
             {
-                tour.RegisteredTickets.Remove(ticketNummer);
+                tour.RegisteredTickets.Remove(ticketNummer.Value);
                 depotContext.SaveChanges();
                 Console.WriteLine(Localization.Ticket_verwijderd);
-                Console.WriteLine(Localization.Ga_terug);
-                Console.ReadLine();
+                ResetMenuState();
                 return;
             }
 
             Console.WriteLine(Localization.Aanmelding_niet_gevonden);
-            Console.WriteLine(Localization.Ga_terug);
-            Console.ReadLine();
+            ResetMenuState();
         }
     }
     private static void AddVisitor(int tourId)
     {
-        int ticketNummer = UserInput.GetNumber(Localization.Scan_uw_ticket, 1);
+        int? ticketNummer = UserInput.GetNumber(Localization.Scan_uw_ticket, 1);
+        if (ticketNummer == null)
+        {
+            ResetMenuState();
+            return;
+        }
+
         var tour = depotContext.Tours.Where(t => t.Id == tourId).FirstOrDefault();
         if (tour != null)
         {
-            if (tour.RegisteredTickets.Contains(ticketNummer))
+            if (tour.RegisteredTickets.Contains(ticketNummer.Value))
             {
                 Console.WriteLine(Localization.Ticket_al_geregistreerd);
-                Console.WriteLine(Localization.Ga_terug);
-                Console.ReadLine();
+                ResetMenuState();
                 return;
             }
 
-            tour.RegisteredTickets.Add(ticketNummer);
+            tour.RegisteredTickets.Add(ticketNummer.Value);
             depotContext.SaveChanges();
             Console.WriteLine(Localization.Ticket_toegevoegd);
-            Console.WriteLine(Localization.Ga_terug);
-            Console.ReadLine();
+            ResetMenuState();
         }
     }
 
@@ -107,18 +115,17 @@ class Program
 
         Console.WriteLine($"{Localization.Rondleiding_om} {tour?.Start.ToString("HH:mm")}");
         Console.WriteLine(Localization.Alle_ticketnummers);
-        foreach (var ticketNummer in tour?.RegisteredTickets)
+        foreach (var ticketNummer in tour!.RegisteredTickets)
         {
             Console.WriteLine($"{Localization.Ticket} {ticketNummer}");
         }
 
-        Console.WriteLine(Localization.Ga_terug);
-        Console.ReadLine();
+        ResetMenuState();
     }
 
     private static bool GetAccount(out User? user, List<Role> allowedRoles)
     {
-        do
+        while (true)
         {
             var userId = UserInput.GetNumber(Localization.Scan_uw_pas, 1);
 
@@ -130,6 +137,16 @@ class Program
 
             Console.SetCursorPosition(0, Console.CursorTop - 1);
             Console.WriteLine(Localization.Ongeldige_invoer);
-        } while (true);
+        }
+    }
+
+    public static void ResetMenuState()
+    {
+        if (consoleMenu != null)
+        {
+            Console.WriteLine(Localization.Ga_terug);
+            consoleMenu.Reset();
+            Console.ReadLine();
+        }
     }
 }

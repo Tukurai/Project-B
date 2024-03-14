@@ -16,7 +16,7 @@ class Program
 
     public static bool Shutdown { get; set; } = false;
 
-    public static int TicketNumber { get; set; }
+    public static int? TicketNumber { get; set; }
 
     static void Main(string[] args)
     {
@@ -50,7 +50,13 @@ class Program
         do
         {
             TicketNumber = UserInput.GetNumber(Localization.Scan_uw_ticket, 1);
-            var reservation = depotContext.Tours.FirstOrDefault(t => t.RegisteredTickets.Contains(TicketNumber));
+            if (TicketNumber == null)
+            {
+                continue;
+            }
+
+
+            var reservation = depotContext.Tours.FirstOrDefault(t => t.RegisteredTickets.Contains(TicketNumber!.Value));
 
             if (reservation != null)
             {
@@ -67,8 +73,7 @@ class Program
 
     private static void ViewReservation()
     {
-        var ticketNumber = UserInput.GetNumber(Localization.Scan_uw_ticket, min: 1);
-        var reservation = depotContext.Tours.FirstOrDefault(t => t.RegisteredTickets.Contains(ticketNumber));
+        var reservation = depotContext.Tours.FirstOrDefault(t => t.RegisteredTickets.Contains(TicketNumber!.Value));
 
         if (reservation != null)
         {
@@ -84,7 +89,7 @@ class Program
 
     private static void EditReservation()
     {
-        var reservation = depotContext.Tours.FirstOrDefault(t => t.RegisteredTickets.Contains(TicketNumber));
+        var reservation = depotContext.Tours.FirstOrDefault(t => t.RegisteredTickets.Contains(TicketNumber!.Value));
 
         if (reservation == null)
         {
@@ -101,7 +106,7 @@ class Program
             return;
         }
 
-        var group = depotContext.Groups.FirstOrDefault(g => g.TicketIds.Contains(TicketNumber));
+        var group = depotContext.Groups.FirstOrDefault(g => g.TicketIds.Contains(TicketNumber!.Value));
         if (group != null && group.GroupOwnerId != TicketNumber)
         {
             Console.WriteLine(Localization.Uw_kunt_uw_reservering_niet_annuleren);
@@ -131,7 +136,7 @@ class Program
 
     private static void CancelReservation()
     {
-        var reservation = depotContext.Tours.FirstOrDefault(t => t.RegisteredTickets.Contains(TicketNumber));
+        var reservation = depotContext.Tours.FirstOrDefault(t => t.RegisteredTickets.Contains(TicketNumber!.Value));
 
         if (reservation == null)
         {
@@ -147,7 +152,7 @@ class Program
             return;
         }
 
-        var group = depotContext.Groups.FirstOrDefault(g => g.TicketIds.Contains(TicketNumber));
+        var group = depotContext.Groups.FirstOrDefault(g => g.TicketIds.Contains(TicketNumber!.Value));
         if (group != null && group.GroupOwnerId != TicketNumber)
         {
             Console.WriteLine(Localization.Uw_kunt_uw_reservering_niet_annuleren);
@@ -161,7 +166,7 @@ class Program
         var userInput = Console.ReadLine() ?? "";
         if (userInput == "y")
         {
-            group.TicketIds.ForEach(t => reservation.RegisteredTickets.Remove(t));
+            group!.TicketIds.ForEach(t => reservation.RegisteredTickets.Remove(t));
             depotContext.Groups.Remove(group);
 
             depotContext.SaveChanges();
@@ -177,16 +182,21 @@ class Program
 
     private static void StartReservation(Group? group = null)
     {
-        int amountOfTickets = group?.TicketIds.Count ?? UserInput.GetNumber(Localization.Hoeveel_plaatsen_wilt_u_reserveren, 1, Globals.Maximum_Plekken);
+        int? amountOfTickets = group?.TicketIds.Count ?? UserInput.GetNumber(Localization.Hoeveel_plaatsen_wilt_u_reserveren, 1, Globals.Maximum_Plekken);
+        if (amountOfTickets == null)
+        {
+            ResetMenuState();
+            return;
+        }
 
-        Tour? tour = GetTour(amountOfTickets);
+        Tour? tour = GetTour(amountOfTickets.Value);
         if (tour == null)
         {
             ResetMenuState();
             return;
         }
 
-        List<int> ticketNumbers = new List<int>() { TicketNumber };
+        List<int> ticketNumbers = new List<int>() { TicketNumber!.Value };
         if (group != null)
         {
             ticketNumbers = group.TicketIds;
@@ -194,8 +204,14 @@ class Program
 
         while (ticketNumbers.Count < amountOfTickets)
         {
-            int additionalTicket = UserInput.GetNumber(Localization.Scan_uw_ticket, min: 1);
-            bool hasReservation = depotContext.Tours.Any(tour => tour.RegisteredTickets.Contains(additionalTicket));
+            int? additionalTicket = UserInput.GetNumber(Localization.Scan_uw_ticket, min: 1);
+            if (additionalTicket == null)
+            {
+                amountOfTickets = ticketNumbers.Count;
+                break;
+            }
+
+            bool hasReservation = depotContext.Tours.Any(tour => tour.RegisteredTickets.Contains(additionalTicket.Value));
 
             if (hasReservation)
             {
@@ -203,16 +219,16 @@ class Program
                 continue;
             }
 
-            if (ticketNumbers.Contains(additionalTicket))
+            if (ticketNumbers.Contains(additionalTicket.Value))
             {
                 Console.WriteLine(Localization.Ticket_zit_al_in_uw_groep);
                 continue;
             }
 
-            ticketNumbers.Add(additionalTicket);
+            ticketNumbers.Add(additionalTicket.Value);
         }
 
-        var newGroup = new Group() { GroupOwnerId = TicketNumber, TicketIds = ticketNumbers };
+        var newGroup = new Group() { GroupOwnerId = TicketNumber!.Value, TicketIds = ticketNumbers };
         depotContext.Groups.Add(newGroup);
 
         tour.RegisteredTickets.AddRange(ticketNumbers);
@@ -256,9 +272,14 @@ class Program
             Console.ResetColor();
         }
 
-        int tourIndex = UserInput.GetNumber(Localization.Welke_rondleiding_wilt_u_reserveren, 0, todaysTours.Count - 1);
-        var tour = todaysTours[tourIndex];
+        int? tourIndex = UserInput.GetNumber(Localization.Welke_rondleiding_wilt_u_reserveren, 0, todaysTours.Count - 1);
+        if (tourIndex == null)
+        {
+            return null;
+        }
 
-        return todaysTours[tourIndex];
+        var tour = todaysTours[tourIndex!.Value];
+
+        return todaysTours[tourIndex!.Value];
     }
 }

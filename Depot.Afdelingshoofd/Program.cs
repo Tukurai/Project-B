@@ -45,14 +45,19 @@ class Program
         {
             Console.WriteLine($"{user.Role}, {user.Id}, {user.Name}.");
         }
-        Console.WriteLine(Localization.Ga_terug);
-        Console.ReadLine();
+
+        ResetMenuState();
     }
 
     private static void CreateUsers()
     {
         Console.WriteLine();
         var amount = UserInput.GetNumber(Localization.Hoeveel_gebruikers_wilt_u_aanmaken, 1, 10);
+        if (amount == null)
+        {
+            ResetMenuState();
+            return;
+        }
 
         List<User> users = new List<User>();
         for (int i = 0; i < amount; i++)
@@ -60,21 +65,23 @@ class Program
             Console.WriteLine($"{Localization.Welke_naam_krijgt_gebruiker} {i + 1}?");
             var name = Console.ReadLine() ?? "";
             var roleId = UserInput.GetNumber($"{Localization.Welke_rol} (0 = {Role.Bezoeker}, 1 = {Role.Gids}, 2 = {Role.Afdelingshoofd}", 0, 2);
+            if (roleId == null)
+            {
+                break;
+            }
 
-            users.Add(new User { Name = name, Role = (Role)roleId });
+            users.Add(new User { Name = name, Role = (Role)roleId.Value });
         }
 
-        depotContext.SaveChanges();
         depotContext.Users.AddRange(users);
+        depotContext.SaveChanges();
 
         foreach (var user in users)
         {
             Console.WriteLine($"{Localization.Aangemaakt}: {user.Role}, {user.Id}, {user.Name}.");
         }
 
-        Console.WriteLine(Localization.Ga_terug);
-        consoleMenu?.Reset();
-        Console.ReadLine();
+        ResetMenuState();
     }
 
     private static void ViewTours()
@@ -97,16 +104,30 @@ class Program
     private static void CreateTours(int daysInTheFuture)
     {
         var beginTijd = UserInput.GetTime(Localization.Start_tijd_rondleidingen);
+        if (beginTijd == null) {
+            ResetMenuState();
+            return; 
+        }
 
         var eindeTijd = UserInput.GetTime(Localization.Eind_tijd_rondleidingen);
+        if (eindeTijd == null)
+        {
+            ResetMenuState();
+            return;
+        }
 
         var interval = UserInput.GetNumber(Localization.Minuten_tussen_rondleidingen, 1, 60);
+        if (interval == null)
+        {
+            ResetMenuState();
+            return;
+        }
 
-        var startTime = DateTime.Now.Date.AddDays(daysInTheFuture).AddMilliseconds(beginTijd.TotalMilliseconds);
-        var endTime = DateTime.Now.Date.AddDays(daysInTheFuture).AddMilliseconds(eindeTijd.TotalMilliseconds);
+        var startTime = DateTime.Now.Date.AddDays(daysInTheFuture).AddMilliseconds(beginTijd.Value.TotalMilliseconds);
+        var endTime = DateTime.Now.Date.AddDays(daysInTheFuture).AddMilliseconds(eindeTijd.Value.TotalMilliseconds);
 
         List<Tour> tours = new List<Tour>();
-        for (var time = startTime; time.AddMinutes(Globals.Rondleiding_Duur) < endTime; time = time.AddMinutes(interval))
+        for (var time = startTime; time.AddMinutes(Globals.Rondleiding_Duur) < endTime; time = time.AddMinutes(interval.Value))
         {
             tours.Add(new Tour { Start = time });
         }
@@ -126,9 +147,15 @@ class Program
 
     private static bool GetAccount(out User? user, List<Role> allowedRoles)
     {
-        do
+        while (true)
         {
             var userId = UserInput.GetNumber(Localization.Scan_uw_pas, 1);
+            if (userId == null)
+            {
+                ResetMenuState();
+                user = null;
+                return false;
+            }
 
             user = depotContext.Users.Where(u => u.Id == userId).FirstOrDefault();
             if (user != null && allowedRoles.Contains(user.Role))
@@ -138,6 +165,16 @@ class Program
 
             Console.SetCursorPosition(0, Console.CursorTop - 1);
             Console.WriteLine(Localization.Ongeldige_invoer);
-        } while (true);
+        }
+    }
+
+    public static void ResetMenuState()
+    {
+        if (consoleMenu != null)
+        {
+            Console.WriteLine(Localization.Ga_terug);
+            consoleMenu.Reset();
+            Console.ReadLine();
+        }
     }
 }

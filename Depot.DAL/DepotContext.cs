@@ -1,12 +1,9 @@
 ﻿using Depot.DAL.Models;
 using Microsoft.EntityFrameworkCore;
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection.Emit;
 using System.Text.Json;
-using System.Threading.Tasks;
 
 namespace Depot.DAL
 {
@@ -15,6 +12,7 @@ namespace Depot.DAL
         public DbSet<User> Users { get; set; }
         public DbSet<Tour> Tours { get; set; }
         public DbSet<Group> Groups { get; set; }
+        public DbSet<Ticket> Tickets { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -24,6 +22,7 @@ namespace Depot.DAL
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<User>().HasKey(b => b.Id).HasName("PrimaryKey_UserId");
+            modelBuilder.Entity<Ticket>().HasKey(b => b.Id).HasName("PrimaryKey_TicketId");
             modelBuilder.Entity<Tour>().HasKey(b => b.Id).HasName("PrimaryKey_TourId");
             modelBuilder.Entity<Group>().HasKey(b => b.Id).HasName("PrimaryKey_GroupId");
         }
@@ -36,6 +35,16 @@ namespace Depot.DAL
                 if (users != null)
                 {
                     Users.AddRange(users);
+                    await SaveChangesAsync();
+                }
+            }
+
+            if (File.Exists("Tickets.json"))
+            {
+                var tickets = JsonSerializer.Deserialize<List<Ticket>>(File.ReadAllText("Tickets.json"));
+                if (tickets != null)
+                {
+                    Tickets.AddRange(tickets);
                     await SaveChangesAsync();
                 }
             }
@@ -66,8 +75,9 @@ namespace Depot.DAL
             int changes = base.SaveChanges();
 
             File.WriteAllText("Users.json", JsonSerializer.Serialize(Users.ToList()));
+            File.WriteAllText("Tickets.json", JsonSerializer.Serialize(Tickets.ToList()));
             File.WriteAllText("Tours.json", JsonSerializer.Serialize(Tours.ToList()));
-            File.WriteAllText("Groups.json", JsonSerializer.Serialize(Tours.ToList()));
+            File.WriteAllText("Groups.json", JsonSerializer.Serialize(Groups.ToList()));
 
             return changes;
         }
