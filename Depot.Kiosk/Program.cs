@@ -16,7 +16,7 @@ class Program
 
     public static bool Shutdown { get; set; } = false;
 
-    public static int? TicketNumber { get; set; }
+    public static long? TicketNumber { get; set; }
 
     static void Main(string[] args)
     {
@@ -182,7 +182,7 @@ class Program
 
     private static void StartReservation(Group? group = null)
     {
-        int? amountOfTickets = group?.TicketIds.Count ?? UserInput.GetNumber(Localization.Hoeveel_plaatsen_wilt_u_reserveren, 1, Globals.Maximum_Plekken);
+        long? amountOfTickets = group?.TicketIds.Count ?? UserInput.GetNumber(Localization.Hoeveel_plaatsen_wilt_u_reserveren, 1, Globals.Maximum_Plekken);
         if (amountOfTickets == null)
         {
             ResetMenuState();
@@ -196,7 +196,7 @@ class Program
             return;
         }
 
-        List<int> ticketNumbers = new List<int>() { TicketNumber!.Value };
+        List<long> ticketNumbers = new List<long>() { TicketNumber!.Value };
         if (group != null)
         {
             ticketNumbers = group.TicketIds;
@@ -204,7 +204,7 @@ class Program
 
         while (ticketNumbers.Count < amountOfTickets)
         {
-            int? additionalTicket = UserInput.GetNumber(Localization.Scan_uw_ticket, min: 1);
+            var additionalTicket = UserInput.GetNumber(Localization.Scan_uw_ticket, min: 1);
             if (additionalTicket == null)
             {
                 amountOfTickets = ticketNumbers.Count;
@@ -249,7 +249,7 @@ class Program
         }
     }
 
-    private static Tour? GetTour(int amountOfTickets)
+    private static Tour? GetTour(long amountOfTickets)
     {
         var today = DateTime.Now;
         var todaysTours = depotContext.Tours.Where(t =>
@@ -272,14 +272,14 @@ class Program
             Console.ResetColor();
         }
 
-        int? tourIndex = UserInput.GetNumber(Localization.Welke_rondleiding_wilt_u_reserveren, 0, todaysTours.Count - 1);
+        var tourIndex = UserInput.GetNumber(Localization.Welke_rondleiding_wilt_u_reserveren, 0, todaysTours.Count - 1);
         if (tourIndex == null)
         {
             return null;
         }
 
-        var tour = todaysTours[tourIndex!.Value];
+        var tour = todaysTours[(int)tourIndex!.Value];
 
-        return todaysTours[tourIndex!.Value];
+        return todaysTours[(int)tourIndex!.Value];
     }
 }

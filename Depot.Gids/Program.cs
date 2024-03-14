@@ -21,7 +21,7 @@ class Program
 
         if (GetAccount(out User? user, new List<Role> { Role.Gids, Role.Afdelingshoofd }))
         {
-            consoleMenu = new PagingMenu($"{user.Role} {user.Name}", Localization.Maak_uw_keuze);
+            consoleMenu = new PagingMenu($"{user!.Role} {user!.Name}", Localization.Maak_uw_keuze);
             consoleMenu.SetListItems(CreateTourList());
 
             consoleMenu.Show();
@@ -58,9 +58,9 @@ class Program
 
         return resultTours;
     }
-    private static void RemoveVisitor(int tourId)
+    private static void RemoveVisitor(long tourId)
     {
-        int? ticketNummer = UserInput.GetNumber(Localization.Scan_uw_ticket, 1);
+        var ticketNummer = UserInput.GetNumber(Localization.Scan_uw_ticket, 1);
         if(ticketNummer == null)
         {
             ResetMenuState();
@@ -83,9 +83,9 @@ class Program
             ResetMenuState();
         }
     }
-    private static void AddVisitor(int tourId)
+    private static void AddVisitor(long tourId)
     {
-        int? ticketNummer = UserInput.GetNumber(Localization.Scan_uw_ticket, 1);
+        var ticketNummer = UserInput.GetNumber(Localization.Scan_uw_ticket, 1);
         if (ticketNummer == null)
         {
             ResetMenuState();
@@ -109,7 +109,7 @@ class Program
         }
     }
 
-    private static void GetTour(int tourNr)
+    private static void GetTour(long tourNr)
     {
         var tour = depotContext.Tours.Where(t => t.Id == tourNr).FirstOrDefault();
 

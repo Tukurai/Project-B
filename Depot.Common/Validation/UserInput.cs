@@ -15,7 +15,7 @@ namespace Depot.Common.Validation
         /// <param name="min">Minimum to pass, null means no lower bound.</param>
         /// <param name="max">Maximum to pass, null means no upper bound.</param>
         /// <returns>The given number parsed as an integer.</returns>
-        public static int? GetNumber(string message, int? min = null, int? max = null)
+        public static long? GetNumber(string message, long? min = null, long? max = null)
         {
             Console.WriteLine(message);
             while (true)
@@ -25,7 +25,7 @@ namespace Depot.Common.Validation
                     return null;
                 }
 
-                if (int.TryParse(amountString, out int amount)
+                if (long.TryParse(amountString, out long amount)
                     && (max == null || amount <= max)
                     && (min == null || amount >= min)
                 )
@@ -80,7 +80,7 @@ namespace Depot.Common.Validation
                     Console.Write(buffer.ToString());
                     Console.CursorLeft = cli;
                 }
-                else if (char.IsLetterOrDigit(key.KeyChar) || char.IsWhiteSpace(key.KeyChar))
+                else if (char.IsLetterOrDigit(key.KeyChar) || char.IsWhiteSpace(key.KeyChar) || key.KeyChar == ':')
                 {
                     var cli = Console.CursorLeft;
                     buffer.Insert(cli, key.KeyChar);

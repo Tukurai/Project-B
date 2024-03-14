@@ -7,8 +7,8 @@ namespace Depot.DAL.Models
 {
     public class Group : DbEntity
     {
-        public int GroupOwnerId { get; set; }
-        public List<int> TicketIds { get; set; } = new List<int>();
+        public long GroupOwnerId { get; set; }
+        public List<long> TicketIds { get; set; } = new List<long>();
     }
 
 }
