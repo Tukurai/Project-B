@@ -6,7 +6,6 @@ using Depot.DAL.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 
 namespace Depot.Gids;
 
@@ -68,7 +67,7 @@ class Program
         
         Console.WriteLine(Localization.Start_Tour_Checkin);
         while (tour!.RegisteredTickets.Count > confirmedTickets.Count) {
-            var ticketNumber = UserInput.GetNumber($"Ticket {confirmedTickets.Count + 1}/{tour!.RegisteredTickets.Count}: ", 1);
+            var ticketNumber = UserInput.GetNumber($"Ticket {confirmedTickets.Count + 1}/{tour.RegisteredTickets.Count}: ", 1);
             if (ticketNumber == null)
             {
                 Console.WriteLine(Localization.Ongeldige_invoer);
@@ -89,7 +88,7 @@ class Program
             }
         
             // If there are less reservations than max openings, add user anyway
-            if (maxSpots > tour!.RegisteredTickets.Count)
+            if (maxSpots > tour.RegisteredTickets.Count)
             {
                 Console.WriteLine(Localization.Ticket_niet_in_reserveringen);
                 tour.RegisteredTickets.Add(ticketNumber.Value);
@@ -97,7 +96,7 @@ class Program
             }
             
             // 
-            if (maxSpots <= tour!.RegisteredTickets.Count)
+            if (maxSpots <= tour.RegisteredTickets.Count)
             {
                 Console.WriteLine(Localization.Rondleiding_Vol);
             }
@@ -119,7 +118,7 @@ class Program
                 break;
             }
             
-            tour.RegisteredTickets.Add(ticketNumber.Value);
+            tour.RegisteredTickets.Add(ticketNumber!.Value);
             depotContext.SaveChanges();
         }
         
