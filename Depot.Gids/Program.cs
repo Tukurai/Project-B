@@ -108,9 +108,9 @@ class Program
         depotContext.SaveChanges();
         
         // If tickets are available to be added, we try to fill up the tour
+        Console.WriteLine(Localization.Plekken_vrij_toevoegen);
         while (confirmedTickets.Count < maxSpots)
         {
-            Console.WriteLine(Localization.Plekken_vrij_toevoegen);
             var ticketNumber = UserInput.GetNumber($"Ticket {tour.RegisteredTickets.Count + 1}/{maxSpots}: ", 1);
 
             if (ticketNumber == 1)
