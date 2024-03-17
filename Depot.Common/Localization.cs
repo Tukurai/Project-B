@@ -20,6 +20,7 @@ namespace Depot.Common
         public const string Ongeldige_invoer_tijd = "Ongeldige invoer. Gebruik het formaat 'uur:minuten'.";
         public const string Bekijken = "Bekijken";
         public const string Rondleiding_om = "Rondleiding om";
+        public const string Bezoeker_Omgeboekt = "Bezoeker verwijderd uit andere reservering, bij deze toegevoegd";
 
         // Afdelingshoofd
         public const string Rondleidingen = "Rondleidingen";
@@ -28,7 +29,7 @@ namespace Depot.Common
         public const string Rondleidingen_aanmaken_voor_vandaag = "Rondleidingen aanmaken voor vandaag.";
         public const string Morgen_plannen = "Morgen plannen";
         public const string Rondleidingen_aanmaken_voor_morgen = "Rondleidingen aanmaken voor morgen.";
-        public const string Rondleidingen_bekijken = "Rondleiingen bekijken.";
+        public const string Rondleidingen_bekijken = "Rondleidingen bekijken.";
         public const string Gebruikers = "Gebruikers";
         public const string Gebruikers_beheren = "Gebruikers beheren.";
         public const string Aanmaken = "Aanmaken";
@@ -60,6 +61,13 @@ namespace Depot.Common
         public const string Ticket_toegevoegd = "Ticket toegevoegd.";
         public const string Ticket_al_geregistreerd = "Dit ticket is al geregistreerd voor een rondleiding.";
         public const string Alle_ticketnummers = "Alle ticketnummers:";
+        public const string Start_Rondleiding = "Start deze rondleiding";
+        public const string Start = "Start";
+        public const string Start_Tour_Checkin = "Scan nu alle tickets met reserveringen (Typ '1' om te stoppen):";
+        public const string Ticket_niet_in_reserveringen = "Ticket zonder reservering toegevoegd aan rondleiding.";
+        public const string Rondleiding_Vol = "Ticket heeft nog geen reservering in deze rondleiding. Voltooi het scannen om te kijken of er plekken vrijkomen.";
+        public const string Plekken_vrij_toevoegen = "De rondleiding is nog niet vol. Voer nu tickets in die geen reservering hebben (of typ '1' om te stoppen):";
+        public const string Rondleiding_Gestart = "De rondleiding is nu gestart.";
 
         // Kiosk
         public const string Kiosk = "Kiosk";
