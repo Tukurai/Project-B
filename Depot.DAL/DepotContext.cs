@@ -14,6 +14,11 @@ namespace Depot.DAL
         public DbSet<Group> Groups { get; set; }
         public DbSet<Ticket> Tickets { get; set; }
 
+        public const string UsersPath = "Users.json";
+        public const string ToursPath = "Tours.json";
+        public const string GroupsPath = "Groups.json";
+        public const string TicketsPath = "Tickets.json";
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder.UseInMemoryDatabase(databaseName: "Depot");
@@ -27,59 +32,37 @@ namespace Depot.DAL
             modelBuilder.Entity<Group>().HasKey(b => b.Id).HasName("PrimaryKey_GroupId");
         }
 
-        public async void LoadJson()
+        public async void LoadContext()
         {
-            if (File.Exists("Users.json"))
-            {
-                var users = JsonSerializer.Deserialize<List<User>>(File.ReadAllText("Users.json"));
-                if (users != null)
-                {
-                    Users.AddRange(users);
-                    await SaveChangesAsync();
-                }
-            }
-
-            if (File.Exists("Tickets.json"))
-            {
-                var tickets = JsonSerializer.Deserialize<List<Ticket>>(File.ReadAllText("Tickets.json"));
-                if (tickets != null)
-                {
-                    Tickets.AddRange(tickets);
-                    await SaveChangesAsync();
-                }
-            }
-
-            if (File.Exists("Tours.json"))
-            {
-                var tours = JsonSerializer.Deserialize<List<Tour>>(File.ReadAllText("Tours.json"));
-                if (tours != null)
-                {
-                    Tours.AddRange(tours);
-                    await SaveChangesAsync();
-                }
-            }
-
-            if (File.Exists("Groups.json"))
-            {
-                var groups = JsonSerializer.Deserialize<List<Group>>(File.ReadAllText("Groups.json"));
-                if (groups != null)
-                {
-                    Groups.AddRange(groups);
-                    await SaveChangesAsync();
-                }
-            }
+            LoadJson(Users, UsersPath);
+            LoadJson(Tours, TicketsPath);
+            LoadJson(Groups, ToursPath);
+            LoadJson(Tickets, GroupsPath);
+            await SaveChangesAsync();
         }
 
         public override int SaveChanges()
         {
             int changes = base.SaveChanges();
 
-            File.WriteAllText("Users.json", JsonSerializer.Serialize(Users.ToList()));
-            File.WriteAllText("Tickets.json", JsonSerializer.Serialize(Tickets.ToList()));
-            File.WriteAllText("Tours.json", JsonSerializer.Serialize(Tours.ToList()));
-            File.WriteAllText("Groups.json", JsonSerializer.Serialize(Groups.ToList()));
+            File.WriteAllText(UsersPath, JsonSerializer.Serialize(Users.ToList()));
+            File.WriteAllText(TicketsPath, JsonSerializer.Serialize(Tickets.ToList()));
+            File.WriteAllText(ToursPath, JsonSerializer.Serialize(Tours.ToList()));
+            File.WriteAllText(GroupsPath, JsonSerializer.Serialize(Groups.ToList()));
 
             return changes;
+        }
+
+        private void LoadJson<T>(DbSet<T> dbSet, string jsonFile) where T : DbEntity
+        {
+            if (File.Exists(jsonFile))
+            {
+                var objs = JsonSerializer.Deserialize<List<T>>(File.ReadAllText(jsonFile));
+                if (objs != null)
+                {
+                    dbSet.AddRange(objs);
+                }
+            }
         }
     }
 }

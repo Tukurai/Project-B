@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-
-namespace Depot.Common.Navigation
+﻿namespace Depot.Common.Navigation
 {
     public class Menu
     {
@@ -120,7 +116,7 @@ namespace Depot.Common.Navigation
 
         public virtual void AddReturnOrShutdown()
         {
-            if (!Options.Any(q=>q.KeyChar == '0'))
+            if (!Options.Any(q => q.KeyChar == '0'))
             {
                 if (Parent == null)
                 {

@@ -1,6 +1,7 @@
 ﻿using Depot.Common;
 using Depot.Common.Navigation;
 using Depot.Common.Validation;
+using Depot.Common.Workflow;
 using Depot.DAL;
 using Depot.DAL.Models;
 using System;
@@ -21,7 +22,7 @@ class Program
     static void Main(string[] args)
     {
         Console.WriteLine(Localization.Load_context);
-        depotContext.LoadJson();
+        depotContext.LoadContext();
 
         Menu reserveringsMenu = new Menu(Localization.Kiosk, Localization.Maak_uw_keuze);
         reserveringsMenu.ReplaceShutdown(() =>
@@ -47,7 +48,7 @@ class Program
         var bekijken = new Menu('3', Localization.Bekijken, Localization.Uw_rondleiding_bekijken, ViewReservation);
         beheerReserveringMenu.AddMenuItem(bekijken);
 
-        do
+        while (!Shutdown)
         {
             TicketNumber = UserInput.GetNumber(Localization.Scan_uw_ticket, 1);
             if (TicketNumber == null)
@@ -68,22 +69,13 @@ class Program
                 consoleMenu = reserveringsMenu;
                 reserveringsMenu.Show();
             }
-        } while (!Shutdown);
+        }
     }
 
     private static void ViewReservation()
     {
-        var reservation = depotContext.Tours.FirstOrDefault(t => t.RegisteredTickets.Contains(TicketNumber!.Value));
-
-        if (reservation != null)
-        {
-            Console.WriteLine($"{Localization.Uw_rondleiding_is_om} {reservation.Start.ToString("HH:mm")}.");
-        }
-        else
-        {
-            Console.WriteLine(Localization.Aanmelding_niet_gevonden);
-        }
-
+        var view = new ViewReservationFlow(depotContext, TicketNumber);
+        Console.WriteLine(view.GetOutput());
         ResetMenuState();
     }
 

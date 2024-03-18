@@ -8,4 +8,8 @@
     <BaseIntermediateOutputPath>obj\</BaseIntermediateOutputPath>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Depot.DAL\Depot.DAL.csproj" />
+  </ItemGroup>
+
 </Project>

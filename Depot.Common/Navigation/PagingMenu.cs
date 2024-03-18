@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace Depot.Common.Navigation
+﻿namespace Depot.Common.Navigation
 {
     public class PagingMenu : Menu
     {

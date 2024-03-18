@@ -1,5 +1,4 @@
-﻿using Depot.Common;
-using Depot.Common.Navigation;
+﻿using Depot.Common.Navigation;
 using Depot.Common.Validation;
 using Depot.DAL;
 using Depot.DAL.Models;
@@ -16,26 +15,27 @@ class Program
 
     static void Main(string[] args)
     {
-        Console.WriteLine(Localization.Load_context);
-        depotContext.LoadJson();
+        Console.WriteLine("Loading context data");
+        depotContext.LoadContext();
 
-        if (GetAccount(out User? user, new List<Role> { Role.Afdelingshoofd }))
-        {
-            consoleMenu = new Menu($"{user.Role} {user.Name}", Localization.Maak_uw_keuze);
+        consoleMenu = new Menu("Afdelingshoofd", "Maak uw keuze uit het menu hieronder:");
 
-            var rondleidingen = new Menu('1', Localization.Rondleidingen, Localization.Rondleidingen_beheren);
-            rondleidingen.AddMenuItem(new Menu('1', Localization.Vandaag_plannen, Localization.Rondleidingen_aanmaken_voor_vandaag, () => { CreateTours(0); }));
-            rondleidingen.AddMenuItem(new Menu('2', Localization.Morgen_plannen, Localization.Rondleidingen_aanmaken_voor_morgen, () => { CreateTours(1); }));
-            rondleidingen.AddMenuItem(new Menu('3', Localization.Bekijken, Localization.Rondleidingen_bekijken, ViewTours));
-            consoleMenu.AddMenuItem(rondleidingen);
+        var rondleidingMakenMorgen = new Menu('1', "Rondleiding maken (Morgen)", "Rondleidingen aanmaken voor morgen.", () => { CreateTours(1); });
+        consoleMenu.AddMenuItem(rondleidingMakenMorgen);
 
-            var gebruikers = new Menu('2', Localization.Gebruikers, Localization.Gebruikers_beheren);
-            gebruikers.AddMenuItem(new Menu('1', Localization.Aanmaken, Localization.Gebruikers_aanmaken, CreateUsers));
-            gebruikers.AddMenuItem(new Menu('2', Localization.Bekijken, Localization.Gebruikers_Bekijken, ViewUsers));
-            consoleMenu.AddMenuItem(gebruikers);
+        var rondleidingMakenVandaag = new Menu('2', "Rondleiding maken (Vandaag)", "Rondleidingen aanmaken voor vandaag.", () => { CreateTours(0); });
+        consoleMenu.AddMenuItem(rondleidingMakenVandaag);
 
-            consoleMenu.Show();
-        }
+        var rondleidingBekijken = new Menu('3', "Rondleiding bekijken", "Rondleidingen bekijken.", ViewTours);
+        consoleMenu.AddMenuItem(rondleidingBekijken);
+
+        var gebruikerMaken = new Menu('4', "Gebruikers maken", "Gebruikers aanmaken.", CreateUsers);
+        consoleMenu.AddMenuItem(gebruikerMaken);
+
+        var gebruikerBekijken = new Menu('5', "Gebruikers bekijken", "Alle gebruikers bekijken.", ViewUsers);
+        consoleMenu.AddMenuItem(gebruikerBekijken);
+
+        consoleMenu.Show();
     }
 
     private static void ViewUsers()
@@ -43,34 +43,23 @@ class Program
         var users = depotContext.Users.ToList();
         foreach (var user in users)
         {
-            Console.WriteLine($"{user.Role}, {user.Id}, {user.Name}.");
+            Console.WriteLine($"Gebruiker Id: {user.Id}, {user.Name}.");
         }
-
-        ResetMenuState();
+        Console.WriteLine("Druk op enter om terug naar het hoofdmenu te gaan.");
+        Console.ReadLine();
     }
 
     private static void CreateUsers()
     {
         Console.WriteLine();
-        var amount = UserInput.GetNumber(Localization.Hoeveel_gebruikers_wilt_u_aanmaken, 1, 10);
-        if (amount == null)
-        {
-            ResetMenuState();
-            return;
-        }
+        var amount = UserInput.GetNumber("Hoeveel gebruikers wilt u aanmaken? (Max 10)", 1, 10);
 
         List<User> users = new List<User>();
         for (int i = 0; i < amount; i++)
         {
-            Console.WriteLine($"{Localization.Welke_naam_krijgt_gebruiker} {i + 1}?");
+            Console.WriteLine($"Geef de naam op van gebruiker {i + 1}:");
             var name = Console.ReadLine() ?? "";
-            var roleId = UserInput.GetNumber($"{Localization.Welke_rol} (0 = {Role.Bezoeker}, 1 = {Role.Gids}, 2 = {Role.Afdelingshoofd}", 0, 2);
-            if (roleId == null)
-            {
-                break;
-            }
-
-            users.Add(new User { Name = name, Role = (Role)roleId.Value });
+            users.Add(new User { Name = name });
         }
 
         depotContext.Users.AddRange(users);
@@ -78,56 +67,38 @@ class Program
 
         foreach (var user in users)
         {
-            Console.WriteLine($"{Localization.Aangemaakt}: {user.Role}, {user.Id}, {user.Name}.");
+            Console.WriteLine($"Gebruiker aangemaakt met Id: {user.Id}, {user.Name}.");
         }
 
-        ResetMenuState();
+        Console.WriteLine("Druk op enter om terug naar het hoofdmenu te gaan.");
+        consoleMenu?.Reset();
+        Console.ReadLine();
     }
 
     private static void ViewTours()
     {
-
-        var today = DateTime.Now;
-        var todaysTours = depotContext.Tours.Where(t =>
-            t.Start.DayOfYear == today.DayOfYear &&
-            t.Start.Year == today.Year &&
-            t.Start.TimeOfDay > today.TimeOfDay)
-            .OrderBy(q => q.Start).ToList();
-        foreach (var tour in todaysTours)
+        var tours = depotContext.Tours.ToList();
+        foreach (var tour in tours)
         {
-            Console.WriteLine($"{Localization.Rondleiding_om} {tour.Start.ToString("HH:mm")}.");
+            Console.WriteLine($"Rondleiding om {tour.Start}.");
         }
-        Console.WriteLine(Localization.Ga_terug);
+        Console.WriteLine("Druk op enter om terug naar het hoofdmenu te gaan.");
         Console.ReadLine();
     }
 
     private static void CreateTours(int daysInTheFuture)
     {
-        var beginTijd = UserInput.GetTime(Localization.Start_tijd_rondleidingen);
-        if (beginTijd == null) {
-            ResetMenuState();
-            return; 
-        }
+        var beginTijd = UserInput.GetTime("Hoe laat beginnen de rondleidingen?");
 
-        var eindeTijd = UserInput.GetTime(Localization.Eind_tijd_rondleidingen);
-        if (eindeTijd == null)
-        {
-            ResetMenuState();
-            return;
-        }
+        var eindeTijd = UserInput.GetTime("Hoe laat eindigen de rondleidingen?");
 
-        var interval = UserInput.GetNumber(Localization.Minuten_tussen_rondleidingen, 1, 60);
-        if (interval == null)
-        {
-            ResetMenuState();
-            return;
-        }
+        var interval = UserInput.GetNumber("Hoeveel minuten zit er tussen de rondleidingen?", 1, 60);
 
-        var startTime = DateTime.Now.Date.AddDays(daysInTheFuture).AddMilliseconds(beginTijd.Value.TotalMilliseconds);
-        var endTime = DateTime.Now.Date.AddDays(daysInTheFuture).AddMilliseconds(eindeTijd.Value.TotalMilliseconds);
+        var startTime = DateTime.Now.Date.AddDays(daysInTheFuture).AddMilliseconds(beginTijd.TotalMilliseconds);
+        var endTime = DateTime.Now.Date.AddDays(daysInTheFuture).AddMilliseconds(eindeTijd.TotalMilliseconds);
 
         List<Tour> tours = new List<Tour>();
-        for (var time = startTime; time.AddMinutes(Globals.Rondleiding_Duur) < endTime; time = time.AddMinutes(interval.Value))
+        for (var time = startTime; time < endTime; time = time.AddMinutes(interval))
         {
             tours.Add(new Tour { Start = time });
         }
@@ -137,44 +108,11 @@ class Program
 
         foreach (var tour in tours)
         {
-            Console.WriteLine($"{Localization.Rondleidingen_aangemaakt_voor} {tour.Start}.");
+            Console.WriteLine($"Rondleiding aangemaakt voor {tour.Start}.");
         }
 
-        Console.WriteLine(Localization.Ga_terug);
+        Console.WriteLine("Druk op enter om terug naar het hoofdmenu te gaan.");
         consoleMenu?.Reset();
         Console.ReadLine();
-    }
-
-    private static bool GetAccount(out User? user, List<Role> allowedRoles)
-    {
-        while (true)
-        {
-            var userId = UserInput.GetNumber(Localization.Scan_uw_pas, 1);
-            if (userId == null)
-            {
-                ResetMenuState();
-                user = null;
-                return false;
-            }
-
-            user = depotContext.Users.Where(u => u.Id == userId).FirstOrDefault();
-            if (user != null && allowedRoles.Contains(user.Role))
-            {
-                return true;
-            }
-
-            Console.SetCursorPosition(0, Console.CursorTop - 1);
-            Console.WriteLine(Localization.Ongeldige_invoer);
-        }
-    }
-
-    public static void ResetMenuState()
-    {
-        if (consoleMenu != null)
-        {
-            Console.WriteLine(Localization.Ga_terug);
-            consoleMenu.Reset();
-            Console.ReadLine();
-        }
     }
 }

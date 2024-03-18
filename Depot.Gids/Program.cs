@@ -17,7 +17,7 @@ class Program
     static void Main(string[] args)
     {
         Console.WriteLine(Localization.Load_context);
-        depotContext.LoadJson();
+        depotContext.LoadContext();
 
         if (GetAccount(out User? user, new List<Role> { Role.Gids, Role.Afdelingshoofd }))
         {
