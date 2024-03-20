@@ -12,14 +12,16 @@ namespace Depot.Common.Workflow
             Tour = context.Tours.FirstOrDefault(t => t.RegisteredTickets.Contains(ticketNumber!.Value));
         }
 
-        public string GetOutput()
+        public override string Validate(out bool valid)
         {
             if (Tour != null)
             {
+                valid = true;
                 return $"{Localization.Uw_rondleiding_is_om} {Tour!.Start.ToString("HH:mm")}.";
             }
             else
             {
+                valid = false;
                 return Localization.Aanmelding_niet_gevonden;
             }
         }

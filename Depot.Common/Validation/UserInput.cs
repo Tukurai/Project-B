@@ -1,4 +1,6 @@
-﻿using System.Text;
+﻿using Depot.DAL;
+using Depot.DAL.Models;
+using System.Text;
 
 namespace Depot.Common.Validation
 {
@@ -56,6 +58,41 @@ namespace Depot.Common.Validation
                 Console.SetCursorPosition(0, Console.CursorTop - 1);
                 Console.WriteLine(Localization.Ongeldige_invoer_tijd);
             }
+        }
+
+
+        public static Tour? GetTour(long amountOfTickets, DepotContext context)
+        {
+            var today = DateTime.Now;
+            var todaysTours = context.Tours.Where(t =>
+                t.Start.DayOfYear == today.DayOfYear &&
+                t.Start.Year == today.Year &&
+                t.Start.TimeOfDay > today.TimeOfDay &&
+                (Globals.Maximum_places - t.RegisteredTickets.Count) >= amountOfTickets)
+                .OrderBy(q => q.Start).ToList();
+
+            if (todaysTours.Count <= 0)
+            {
+                Console.WriteLine(Localization.Geen_rondleidingen_meer);
+                return null;
+            }
+
+            Console.WriteLine(Localization.Rondleidingen_van_vandaag);
+            for (int i = 0; i < todaysTours.Count; i++)
+            {
+                Console.WriteLine($"{i}. {Localization.Rondleiding_om} {todaysTours[i].Start.ToString("HH:mm")}");
+                Console.ResetColor();
+            }
+
+            var tourIndex = UserInput.GetNumber(Localization.Welke_rondleiding_wilt_u_reserveren, 0, todaysTours.Count - 1);
+            if (tourIndex == null)
+            {
+                return null;
+            }
+
+            var tour = todaysTours[(int)tourIndex!.Value];
+
+            return todaysTours[(int)tourIndex!.Value];
         }
 
 

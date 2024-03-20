@@ -94,11 +94,11 @@ class Program
 
         var interval = UserInput.GetNumber("Hoeveel minuten zit er tussen de rondleidingen?", 1, 60);
 
-        var startTime = DateTime.Now.Date.AddDays(daysInTheFuture).AddMilliseconds(beginTijd.TotalMilliseconds);
-        var endTime = DateTime.Now.Date.AddDays(daysInTheFuture).AddMilliseconds(eindeTijd.TotalMilliseconds);
+        var startTime = DateTime.Now.Date.AddDays(daysInTheFuture).AddMilliseconds(beginTijd!.Value.TotalMilliseconds);
+        var endTime = DateTime.Now.Date.AddDays(daysInTheFuture).AddMilliseconds(eindeTijd!.Value.TotalMilliseconds);
 
         List<Tour> tours = new List<Tour>();
-        for (var time = startTime; time < endTime; time = time.AddMinutes(interval))
+        for (var time = startTime; time < endTime; time = time.AddMinutes((int)interval!.Value))
         {
             tours.Add(new Tour { Start = time });
         }

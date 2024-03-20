@@ -53,7 +53,7 @@
 
                 foreach (var item in ActiveItem.Options)
                 {
-                    Console.WriteLine($"{item.KeyChar}. {item.Title.PadRight(Globals.Menu_Pad_Right)} | {item.Description}");
+                    Console.WriteLine($"{item.KeyChar}. {item.Title.PadRight(Globals.Menu_pad_right)} | {item.Description}");
                 }
 
                 if (ActiveItem.GetType() == typeof(PagingMenu))
@@ -62,7 +62,7 @@
                     {
                         foreach (var item in Pages.Skip(PageNumber).First())
                         {
-                            Console.WriteLine($"{item.KeyChar}. {item.Title.PadRight(Globals.Menu_Pad_Right)} | {item.Description}");
+                            Console.WriteLine($"{item.KeyChar}. {item.Title.PadRight(Globals.Menu_pad_right)} | {item.Description}");
                         }
                     }
                 }

@@ -2,7 +2,7 @@
 
 namespace Depot.Common.Workflow
 {
-    public class Workflow : IWorkflow
+    public abstract class Workflow : IWorkflow
     {
         public DepotContext Context { get; set; }
 
@@ -10,5 +10,7 @@ namespace Depot.Common.Workflow
         {
             Context = context;
         }
+
+        public abstract string Validate(out bool valid);
     }
 }

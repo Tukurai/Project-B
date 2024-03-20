@@ -1,9 +1,6 @@
-﻿using Depot.Common;
-using System.ComponentModel.DataAnnotations;
-
-namespace Depot.DAL.Models
+﻿namespace Depot.DAL.Models
 {
-    public class Ticket: DbEntity
+    public class Ticket : DbEntity
     {
     }
 }

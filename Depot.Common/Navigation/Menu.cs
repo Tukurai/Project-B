@@ -58,7 +58,7 @@
 
                 foreach (var item in ActiveItem.Options)
                 {
-                    Console.WriteLine($"{item.KeyChar}. {item.Title.PadRight(Globals.Menu_Pad_Right)} | {item.Description}");
+                    Console.WriteLine($"{item.KeyChar}. {item.Title.PadRight(Globals.Menu_pad_right)} | {item.Description}");
                 }
 
                 Console.WriteLine();

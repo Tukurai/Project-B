@@ -84,6 +84,9 @@
         public const string Ticket_heeft_al_een_reservering = "Dit ticket heeft al een reservering.";
         public const string Uw_kunt_uw_reservering_niet_meer_aanpassen = "Uw kunt uw reservering niet meer aanpassen.";
         public const string Uw_kunt_uw_reservering_niet_annuleren = "Uw kunt uw reservering niet wijzigen, laat uw groepsbeheerder dit doen.";
+        public const string Uw_rondleiding_is_gereserveerd = "Uw rondleiding is gereserveerd.";
         public const string Ticket_zit_al_in_uw_groep = "Dit ticket is al toegevoegd aan uw groep";
+        public const string Ticket_is_toegevoegd = "Ticket toegevoegd.";
+
     }
 }

@@ -42,11 +42,11 @@ class Program
 
         todaysTours.ForEach(t =>
         {
-            var tourDetailsMenuItem = new Menu(index.ToString()[0], $"{Localization.Rondleidingen_van} {t.Start.ToString("HH:mm")}", $"{Localization.Aanmeldingen}: {t.RegisteredTickets.Count}/{Globals.Maximum_Plekken}, {Localization.Gestart}: {(t.Departed ? Localization.Ja : Localization.Nee)}", null, consoleMenu);
+            var tourDetailsMenuItem = new Menu(index.ToString()[0], $"{Localization.Rondleidingen_van} {t.Start.ToString("HH:mm")}", $"{Localization.Aanmeldingen}: {t.RegisteredTickets.Count}/{Globals.Maximum_places}, {Localization.Gestart}: {(t.Departed ? Localization.Ja : Localization.Nee)}", null, consoleMenu);
             tourDetailsMenuItem.AddMenuItem(new Menu('1', Localization.Bekijk_details, Localization.Bekijk_details_van_deze_rondleiding, () => { GetTour(t.Id); }, tourDetailsMenuItem));
             tourDetailsMenuItem.AddMenuItem(new Menu('2', Localization.Toevoegen_bezoeker, Localization.Een_bezoeker_toevoegen_aan_deze_rondleiding, () => { AddVisitor(t.Id); }, tourDetailsMenuItem));
             tourDetailsMenuItem.AddMenuItem(new Menu('3', Localization.Verwijderen_bezoeker, Localization.Een_bezoeker_verwijderen_van_deze_rondleiding, () => { RemoveVisitor(t.Id); }, tourDetailsMenuItem));
-            tourDetailsMenuItem.AddMenuItem(new Menu('4', Localization.Start,Localization.Start_Rondleiding, () => { StartTour(t.Id); }, tourDetailsMenuItem));
+            tourDetailsMenuItem.AddMenuItem(new Menu('4', Localization.Start, Localization.Start_Rondleiding, () => { StartTour(t.Id); }, tourDetailsMenuItem));
             tourDetailsMenuItem.AddReturnOrShutdown();
 
             resultTours.Add(tourDetailsMenuItem);
@@ -62,11 +62,12 @@ class Program
     private static void StartTour(long tourId)
     {
         var tour = depotContext.Tours.FirstOrDefault(t => t.Id == tourId);
-        int maxSpots = Globals.Maximum_Plekken;
+        int maxSpots = Globals.Maximum_places;
         List<long> confirmedTickets = new List<long>();
-        
+
         Console.WriteLine(Localization.Start_Tour_Checkin);
-        while (tour!.RegisteredTickets.Count > confirmedTickets.Count) {
+        while (tour!.RegisteredTickets.Count > confirmedTickets.Count)
+        {
             var ticketNumber = UserInput.GetNumber($"Ticket {confirmedTickets.Count + 1}/{tour.RegisteredTickets.Count}: ", 1);
             if (ticketNumber == null)
             {
@@ -79,14 +80,14 @@ class Program
             {
                 break;
             }
-            
+
             if (tour.RegisteredTickets.Contains(ticketNumber.Value))
             {
                 confirmedTickets.Add(ticketNumber.Value);
                 UpdateMenuState();
                 continue;
             }
-        
+
             // If there are less reservations than max openings, add user anyway
             if (maxSpots > tour.RegisteredTickets.Count)
             {
@@ -94,7 +95,7 @@ class Program
                 tour.RegisteredTickets.Add(ticketNumber.Value);
                 depotContext.SaveChanges();
             }
-            
+
             // 
             if (maxSpots <= tour.RegisteredTickets.Count)
             {
@@ -106,7 +107,7 @@ class Program
         var presentTickets = tour.RegisteredTickets.Intersect(confirmedTickets).ToList();
         tour.RegisteredTickets = presentTickets;
         depotContext.SaveChanges();
-        
+
         // If tickets are available to be added, we try to fill up the tour
         Console.WriteLine(Localization.Plekken_vrij_toevoegen);
         while (confirmedTickets.Count < maxSpots)
@@ -117,21 +118,21 @@ class Program
             {
                 break;
             }
-            
+
             tour.RegisteredTickets.Add(ticketNumber!.Value);
             depotContext.SaveChanges();
         }
-        
+
         Console.WriteLine(Localization.Rondleiding_Gestart);
         tour.Departed = true;
         UpdateMenuState();
         ResetMenuState();
     }
-    
+
     private static void RemoveVisitor(long tourId)
     {
         var ticketNummer = UserInput.GetNumber(Localization.Scan_uw_ticket, 1);
-        if(ticketNummer == null)
+        if (ticketNummer == null)
         {
             ResetMenuState();
             return;
@@ -200,7 +201,7 @@ class Program
             var userId = UserInput.GetNumber(Localization.Scan_uw_pas, 1);
 
             user = depotContext.Users.Where(u => u.Id == userId).FirstOrDefault();
-            if (user != null && allowedRoles.Contains(user.Role))
+            if (user != null && allowedRoles.Contains((Role)user.Role))
             {
                 return true;
             }

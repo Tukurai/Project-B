@@ -6,7 +6,7 @@ namespace Depot.DAL.Models
     public class DbEntity
     {
         [Key]
-        public long Id { get; init;}
+        public long Id { get; init; }
     }
-    
+
 }
