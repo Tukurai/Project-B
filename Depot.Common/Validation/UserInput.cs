@@ -60,6 +60,29 @@ namespace Depot.Common.Validation
             }
         }
 
+        /// <summary>
+        /// Asks the user for a date in the format 'dd-mm-yyyy'.
+        /// </summary>
+        /// <param name="message">The message to show the user when asking for the date.</param>
+        /// <returns>The given date parsed as a datetime.</returns>
+        public static DateTime? GetDate(object message)
+        {
+            Console.WriteLine(message);
+            while (true)
+            {
+                if (!CancelableReadline(out string date))
+                {
+                    return DateTime.MinValue;
+                }
+
+                if (DateTime.TryParseExact(date, "dd-MM-yyyy", null, System.Globalization.DateTimeStyles.None, out DateTime parsedDate))
+                {
+                    return parsedDate;
+                }
+                Console.SetCursorPosition(0, Console.CursorTop - 1);
+                Console.WriteLine(Localization.Ongeldige_invoer_datum);
+            }
+        }
 
         public static Tour? GetTour(long amountOfTickets, DepotContext context)
         {
@@ -113,7 +136,7 @@ namespace Depot.Common.Validation
                     Console.Write(buffer.ToString());
                     Console.CursorLeft = cli;
                 }
-                else if (char.IsLetterOrDigit(key.KeyChar) || char.IsWhiteSpace(key.KeyChar) || key.KeyChar == ':')
+                else if (char.IsLetterOrDigit(key.KeyChar) || char.IsWhiteSpace(key.KeyChar) || key.KeyChar == ':' || key.KeyChar == '-')
                 {
                     var cli = Console.CursorLeft;
                     buffer.Insert(cli, key.KeyChar);

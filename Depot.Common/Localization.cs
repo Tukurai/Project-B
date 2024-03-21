@@ -12,6 +12,7 @@
         public const string Maak_uw_keuze = "Maak uw keuze:";
         public const string Ongeldige_invoer = "Ongeldige invoer.";
         public const string Ongeldige_invoer_tijd = "Ongeldige invoer. Gebruik het formaat 'uur:minuten'.";
+        public const string Ongeldige_invoer_datum = "Ongeldige invoer. Gebruik het formaat 'dd-mm-yyyy'.";
         public const string Bekijken = "Bekijken";
         public const string Rondleiding_om = "Rondleiding om";
         public const string Bezoeker_Omgeboekt = "Bezoeker verwijderd uit andere reservering, bij deze toegevoegd";
@@ -23,6 +24,8 @@
         public const string Rondleidingen_aanmaken_voor_vandaag = "Rondleidingen aanmaken voor vandaag.";
         public const string Morgen_plannen = "Morgen plannen";
         public const string Rondleidingen_aanmaken_voor_morgen = "Rondleidingen aanmaken voor morgen.";
+        public const string Plannen_tot_datum = "Plannen tot";
+        public const string Rondleidingen_aanmaken_tot_datum = "Rondleidingen aanmaken tot ";
         public const string Rondleidingen_bekijken = "Rondleidingen bekijken.";
         public const string Gebruikers = "Gebruikers";
         public const string Gebruikers_beheren = "Gebruikers beheren.";
@@ -33,6 +36,8 @@
         public const string Welke_naam_krijgt_gebruiker = "Welke naam krijgt gebruiker";
         public const string Welke_rol = "Welke rol";
         public const string Aangemaakt = "Aangemaakt";
+        public const string Start_datum_rondleidingen = "Start datum voor rondleidingen:";
+        public const string Eind_datum_rondleidingen = "Eind datum voor rondleidingen:";
         public const string Start_tijd_rondleidingen = "Start tijd rondleidingen:";
         public const string Eind_tijd_rondleidingen = "Eind tijd rondleidingen:";
         public const string Minuten_tussen_rondleidingen = "Minuten tussen rondleidingen:";
