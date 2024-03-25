@@ -16,6 +16,9 @@
         public const string Bekijken = "Bekijken";
         public const string Rondleiding_om = "Rondleiding om";
         public const string Bezoeker_Omgeboekt = "Bezoeker verwijderd uit andere reservering, bij deze toegevoegd";
+        public const string Gebruiker_niet_gevonden = "Gebruiker niet gevonden.";
+        public const string Gebruiker_heeft_geen_toegang = "Gebruiker heeft geen toegang.";
+        public const string Gebruiker_gevalideerd = "Gebruiker gevalideerd.";
 
         // Afdelingshoofd
         public const string Rondleidingen = "Rondleidingen";
@@ -42,6 +45,7 @@
         public const string Eind_tijd_rondleidingen = "Eind tijd rondleidingen:";
         public const string Minuten_tussen_rondleidingen = "Minuten tussen rondleidingen:";
         public const string Rondleidingen_aangemaakt_voor = "Rondleidingen aangemaakt voor";
+        public const string Niet_alle_gegevens_ingevuld = "Niet alle gegevens zijn ingevuld.";
 
         // Gids
         public const string Bekijk_details = "Bekijk details";
@@ -65,8 +69,9 @@
         public const string Start_Tour_Checkin = "Scan nu alle tickets met reserveringen (Typ '1' om te stoppen):";
         public const string Ticket_niet_in_reserveringen = "Ticket zonder reservering toegevoegd aan rondleiding.";
         public const string Rondleiding_Vol = "Ticket heeft nog geen reservering in deze rondleiding. Voltooi het scannen om te kijken of er plekken vrijkomen.";
-        public const string Plekken_vrij_toevoegen = "De rondleiding is nog niet vol. Voer nu tickets in die geen reservering hebben (of typ '1' om te stoppen):";
+        public const string Plekken_vrij_toevoegen = "De rondleiding is nog niet vol. Voer nu tickets in die geen reservering hebben:";
         public const string Rondleiding_Gestart = "De rondleiding is nu gestart.";
+        public const string Ticket_hoort_niet_bij_deze_rondleiding = "Dit ticket heeft geen reservering op deze rondleiding.";
 
         // Kiosk
         public const string Kiosk = "Kiosk";

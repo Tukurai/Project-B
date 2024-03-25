@@ -8,11 +8,13 @@ namespace Depot.Common.Workflow
         public Tour? Tour { get; set; }
         public Group? Group { get; set; }
         public long? TicketNumber { get; set; }
+        public long? TourId { get; set; }
 
-        public CancelReservationFlow(DepotContext context, long? ticketNumber) : base(context)
+        public CancelReservationFlow(DepotContext context, long? ticketNumber, long? tourId = null) : base(context)
         {
             Tour = context.Tours.FirstOrDefault(t => t.RegisteredTickets.Contains(ticketNumber!.Value));
             TicketNumber = ticketNumber;
+            TourId = tourId;
         }
 
         public override string Validate(out bool valid)
@@ -22,6 +24,11 @@ namespace Depot.Common.Workflow
             if (Tour == null)
             {
                 return Localization.Aanmelding_niet_gevonden;
+            }
+
+            if (TourId != null && Tour.Id != TourId)
+            {
+                return Localization.Ticket_hoort_niet_bij_deze_rondleiding;
             }
 
             if (Tour.Departed)

@@ -53,6 +53,7 @@ namespace Depot.Common.Workflow
             return true;
         }
 
+        public bool SetTour(long? tourId) => SetTour(Context.Tours.Find(tourId));
         public bool SetTour(Tour? tour)
         {
             if (tour == null)
@@ -63,6 +64,7 @@ namespace Depot.Common.Workflow
             Tour = tour;
             return true;
         }
+
 
         public override string Validate(out bool valid)
         {
