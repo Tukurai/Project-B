@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-
-namespace Depot.Common.Navigation
+﻿namespace Depot.Common.Navigation
 {
     public class Menu
     {
@@ -62,7 +58,7 @@ namespace Depot.Common.Navigation
 
                 foreach (var item in ActiveItem.Options)
                 {
-                    Console.WriteLine($"{item.KeyChar}. {item.Title.PadRight(Globals.Menu_Pad_Right)} | {item.Description}");
+                    Console.WriteLine($"{item.KeyChar}. {item.Title.PadRight(Globals.Menu_pad_right)} | {item.Description}");
                 }
 
                 Console.WriteLine();
@@ -120,7 +116,7 @@ namespace Depot.Common.Navigation
 
         public virtual void AddReturnOrShutdown()
         {
-            if (!Options.Any(q=>q.KeyChar == '0'))
+            if (!Options.Any(q => q.KeyChar == '0'))
             {
                 if (Parent == null)
                 {
