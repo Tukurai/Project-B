@@ -12,18 +12,27 @@
         public const string Maak_uw_keuze = "Maak uw keuze:";
         public const string Ongeldige_invoer = "Ongeldige invoer.";
         public const string Ongeldige_invoer_tijd = "Ongeldige invoer. Gebruik het formaat 'uur:minuten'.";
+        public const string Ongeldige_invoer_datum = "Ongeldige invoer. Gebruik het formaat 'dd-mm-yyyy'.";
         public const string Bekijken = "Bekijken";
         public const string Rondleiding_om = "Rondleiding om";
         public const string Bezoeker_Omgeboekt = "Bezoeker verwijderd uit andere reservering, bij deze toegevoegd";
         public const string Rondleiding_al_gestart = "Deze rondleiding is al gestart.";
+        public const string Gebruiker_niet_gevonden = "Gebruiker niet gevonden.";
+        public const string Gebruiker_heeft_geen_toegang = "Gebruiker heeft geen toegang.";
+        public const string Gebruiker_gevalideerd = "Gebruiker gevalideerd.";
 
         // Afdelingshoofd
         public const string Rondleidingen = "Rondleidingen";
         public const string Rondleidingen_beheren = "Rondleidingen beheren.";
         public const string Vandaag_plannen = "Vandaag plannen";
         public const string Rondleidingen_aanmaken_voor_vandaag = "Rondleidingen aanmaken voor vandaag.";
+        public const string Plannen_tot_datum = "Plannen tot";
+        public const string Rondleidingen_aanmaken_tot_datum = "Rondleidingen aanmaken tot ";
         public const string Morgen_plannen = "Morgen plannen";
         public const string Rondleidingen_aanmaken_voor_morgen = "Rondleidingen aanmaken voor morgen.";
+        public const string Start_datum_rondleidingen = "Start datum voor rondleidingen:";
+        public const string Eind_datum_rondleidingen = "Eind datum voor rondleidingen:";
+        public const string Niet_alle_gegevens_ingevuld = "Niet alle gegevens zijn ingevuld.";
         public const string Rondleidingen_bekijken = "Rondleidingen bekijken.";
         public const string Gebruikers = "Gebruikers";
         public const string Gebruikers_beheren = "Gebruikers beheren.";
@@ -52,6 +61,7 @@
         public const string Bekijk_details_van_deze_rondleiding = "Bekijk details van deze rondleiding.";
         public const string Een_bezoeker_toevoegen_aan_deze_rondleiding = "Een bezoeker toevoegen aan deze rondleiding.";
         public const string Een_bezoeker_verwijderen_van_deze_rondleiding = "Een bezoeker verwijderen van deze rondleiding.";
+        public const string Ticket_hoort_niet_bij_deze_rondleiding = "Dit ticket heeft geen reservering op deze rondleiding.";
         public const string Ticket_verwijderd = "Ticket verwijderd.";
         public const string Ticket_toegevoegd = "Ticket toegevoegd.";
         public const string Ticket_al_geregistreerd = "Dit ticket is al geregistreerd voor een rondleiding.";
@@ -84,7 +94,9 @@
         public const string Welke_rondleiding_wilt_u_reserveren = "Welke rondleiding wilt u reserveren?";
         public const string Ticket_heeft_al_een_reservering = "Dit ticket heeft al een reservering.";
         public const string Uw_kunt_uw_reservering_niet_meer_aanpassen = "Uw kunt uw reservering niet meer aanpassen.";
-        public const string Uw_kunt_uw_reservering_niet_annuleren = "Uw kunt uw reservering niet wijzigen, laat uw groepsbeheerder dit doen.";
+        public const string Uw_kunt_uw_reservering_niet_annuleren = "Uw kunt uw reservering niet wijzigen, laat uw groepsbeheerder dit doen."; 
+        public const string Uw_rondleiding_is_gereserveerd = "Uw rondleiding is gereserveerd.";
         public const string Ticket_zit_al_in_uw_groep = "Dit ticket is al toegevoegd aan uw groep";
+        public const string Ticket_is_toegevoegd = "Ticket toegevoegd.";
     }
 }
