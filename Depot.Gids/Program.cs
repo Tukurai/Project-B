@@ -76,14 +76,18 @@ class Program
     private static void StartTour(long tourId)
     {
         var startTour = new StartTourFlow(depotContext, tourId);
-
-        List<long> confirmedTickets = new List<long>();
+        if (startTour.Tour!.Departed)
+        {
+            Console.WriteLine(Localization.Rondleiding_al_gestart);
+            ResetMenuState();
+            return;
+        }
 
         Console.WriteLine(Localization.Start_Tour_Checkin);
 
         while (startTour.Tour!.RegisteredTickets.Count > startTour.ConfirmedTickets.Count)
         {
-            var ticketNumber = UserInput.GetNumber($"{Localization.Ticket} {confirmedTickets.Count + 1}/{startTour.Tour!.RegisteredTickets.Count}: ", 1);
+            var ticketNumber = UserInput.GetNumber($"{Localization.Ticket} {startTour.ConfirmedTickets.Count + 1}/{startTour.Tour!.RegisteredTickets.Count}: ", 1);
             var valid = startTour.AddTicket(ticketNumber, out string? message);
 
             if (message != null)
