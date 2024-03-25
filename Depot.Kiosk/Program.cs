@@ -114,6 +114,7 @@ class Program
             {
                 Console.WriteLine(Localization.Reservering_is_geannuleerd);
             }
+            ResetMenuState();
             return;
         }
 
