@@ -32,9 +32,9 @@ namespace Depot.DAL
         public async void LoadContext()
         {
             LoadJson(Users, UsersPath);
-            LoadJson(Tours, TicketsPath);
-            LoadJson(Groups, ToursPath);
-            LoadJson(Tickets, GroupsPath);
+            LoadJson(Tours, ToursPath);
+            LoadJson(Groups, GroupsPath);
+            LoadJson(Tickets, TicketsPath);
             await SaveChangesAsync();
         }
 

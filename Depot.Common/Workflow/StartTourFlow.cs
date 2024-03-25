@@ -12,7 +12,7 @@ namespace Depot.Common.Workflow
     public class StartTourFlow : Workflow
     {
         public Tour? Tour { get; set; }
-        public List<long> ConfirmedTickets { get; set; }
+        public List<long> ConfirmedTickets { get; set; } = new List<long>();
 
         public StartTourFlow(DepotContext context, long? tourId) : base(context)
         {
